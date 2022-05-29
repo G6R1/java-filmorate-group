@@ -1,58 +1,66 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
-    private int filmID = 0;
-    private final Map<String, Film> films = new HashMap<>();
+    private final FilmService filmService;
+    private final FilmStorage filmStorage;
+
+    @Autowired
+    public FilmController(FilmService filmService, FilmStorage filmStorage) {
+        this.filmService = filmService;
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping
     public Collection<Film> getFilms() {
-        log.debug("Текущее количество фильмов: {}", films.size());
-        return films.values();
+        log.debug("Текущее количество фильмов: {}", filmStorage.getFilms().size());
+        return filmStorage.getFilms();
+    }
+
+    @GetMapping(value = "/{id}")
+    public Film getFilm(@PathVariable Integer id) {
+        return filmStorage.getFilm(id);
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        if (validate(film)) {
-            filmID++;
-            film.setId(filmID);
-            films.put(film.getName(), film);
-        } else {
-            throw new ValidationException("неправильный фильм");
-        }
         log.debug("Добавлен фильм: {}", film);
-        return film;
+        return filmStorage.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (validate(film) && films.containsKey(film.getName()))
-            films.put(film.getName(), film);
-        else {
-            throw new ValidationException("такого фильма нет в списке");
-        }
         log.debug("Обновлён фильм: {}", film);
-        return film;
+        return filmStorage.updateFilm(film);
     }
 
-    private boolean validate(Film film) {
-        return !LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28));
+    @PutMapping("/{id}/like/{userId}")
+    public Film addLike(@PathVariable Integer id, @PathVariable Integer userId) {
+        return filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film removeLike(@PathVariable Integer id, @PathVariable Integer userId) {
+        return filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getPopular(@RequestParam(defaultValue = "10", required = false) Integer count) {
+        return filmService.getPopular(count);
     }
 }
