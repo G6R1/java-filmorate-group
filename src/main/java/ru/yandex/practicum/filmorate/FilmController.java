@@ -39,6 +39,7 @@ public class FilmController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Film create(@Valid @RequestBody Film film) {
         log.debug("Добавлен фильм: {}", film);
         return filmService.createFilm(film);
@@ -69,11 +70,5 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopular(@Positive @RequestParam(defaultValue = "10", required = false) int count) {
         return filmService.getPopular(count);
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    private ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException e) {
-        return new ResponseEntity<>("неверное значение параметра: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

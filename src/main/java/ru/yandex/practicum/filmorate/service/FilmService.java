@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -29,15 +30,13 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
-        if (validate(film) || filmStorage.getFilms().containsKey(film.getId()))
-            throw new ValidationException("неправильный фильм");
+        validate(film);
         filmStorage.createFilm(film);
         return film;
     }
 
     public Film updateFilm(Film film) {
-        if (validate(film) || !filmStorage.getFilms().containsKey(film.getId()))
-            throw new NotFoundException("такого фильма нет в списке");
+        validate(film);
         getFilm(film.getId());
         filmStorage.updateFilm(film);
         return film;
@@ -49,12 +48,7 @@ public class FilmService {
     }
 
     public List<Film> getFilms() {
-        List<Film> filmList = new ArrayList<>(0);
-        for (Long key : filmStorage.getFilms().keySet()) {
-            Film film = filmStorage.getFilms().get(key);
-            filmList.add(film);
-        }
-        return filmList;
+        return new ArrayList<>(filmStorage.getFilms().values());
     }
 
     public Film addLike(long filmId, long userId) {
@@ -68,25 +62,20 @@ public class FilmService {
     public Film removeLike(long filmId, long userId) {
         User user = userService.getUser(userId);
         Film film = getFilm(filmId);
-        if (film.getLikes().isEmpty()) {
-            throw new NotFoundException("отсутствует список лайков");
-        } else {
+        if (!film.getLikes().contains(userId))
+            throw new NotFoundException("пользователь не ставил лайков");
             film.removeLike(user.getId());
-        }
         return film;
     }
 
     public List<Film> getPopular(int count) {
-        List<Film> popular;
-        popular = getFilms();
+        List<Film> popular = getFilms();
         popular.sort(Film.COMPARE_BY_RATE);
-        if (count < popular.size()) {
-            return popular.subList(0, count);
-        } else
-            return popular;
+            return popular.stream().limit(count).collect(Collectors.toList());
     }
 
-    private boolean validate(Film film) {
-        return LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28));
+    private void validate(Film film) {
+        if (LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28)))
+            throw new ValidationException("неправильный фильм");
     }
 }
