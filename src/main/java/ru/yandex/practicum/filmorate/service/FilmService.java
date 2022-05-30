@@ -2,39 +2,74 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.InternalErrorException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class FilmService {
     private FilmStorage filmStorage;
-    private UserStorage userStorage;
+    private UserService userService;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(FilmStorage filmStorage, UserService userService) {
         this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+        this.userService = userService;
     }
 
-    public Film addLike(int filmId, int userId) {
-        Film film = filmStorage.getFilm(filmId);
-        User user = userStorage.getUser(userId);
+    public Film getFilm(long filmId) {
+        return filmStorage.getFilm(filmId)
+                .orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
+    }
+
+    public Film createFilm(Film film) {
+        if (validate(film) || filmStorage.getFilms().containsKey(film.getId()))
+            throw new ValidationException("неправильный фильм");
+        filmStorage.createFilm(film);
+        return film;
+    }
+
+    public Film updateFilm(Film film) {
+        if (validate(film) || !filmStorage.getFilms().containsKey(film.getId()))
+            throw new NotFoundException("такого фильма нет в списке");
+        getFilm(film.getId());
+        filmStorage.updateFilm(film);
+        return film;
+    }
+
+    public void removeFilm(long filmId) {
+        getFilm(filmId);
+        filmStorage.removeFilm(filmId);
+    }
+
+    public List<Film> getFilms() {
+        List<Film> filmList = new ArrayList<>(0);
+        for (Long key : filmStorage.getFilms().keySet()) {
+            Film film = filmStorage.getFilms().get(key);
+            filmList.add(film);
+        }
+        return filmList;
+    }
+
+    public Film addLike(long filmId, long userId) {
+        Film film = getFilm(filmId);
+        User user = userService.getUser(userId);
         film.addLike(user.getId());
         filmStorage.updateFilm(film);
         return film;
     }
 
-    public Film removeLike(int filmId, int userId) {
-        User user = userStorage.getUser(userId);
-        Film film = filmStorage.getFilm(filmId);
-        if (film.getLikes() == null) {
-            throw new InternalErrorException("отсутствует список лайков");
+    public Film removeLike(long filmId, long userId) {
+        User user = userService.getUser(userId);
+        Film film = getFilm(filmId);
+        if (film.getLikes().isEmpty()) {
+            throw new NotFoundException("отсутствует список лайков");
         } else {
             film.removeLike(user.getId());
         }
@@ -43,15 +78,15 @@ public class FilmService {
 
     public List<Film> getPopular(int count) {
         List<Film> popular;
-        if (count < 0) {
-            throw new ValidationException("запрос не соответствует количеству фильмов");
-        } else {
-            popular = filmStorage.getFilms();
-            popular.sort(Film.COMPARE_BY_RATE);
-        }
+        popular = getFilms();
+        popular.sort(Film.COMPARE_BY_RATE);
         if (count < popular.size()) {
             return popular.subList(0, count);
         } else
             return popular;
+    }
+
+    private boolean validate(Film film) {
+        return LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28));
     }
 }

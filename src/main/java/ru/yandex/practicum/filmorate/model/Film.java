@@ -14,30 +14,27 @@ import java.util.Set;
 @Data
 public class Film {
     @NotBlank(message = "incorrect name")
-    String name;
-    int id;
+    private String name;
+    private long id;
     @NotBlank(message = "incorrect description")
     @Size(max = 200, message = "max length 200")
-    String description;
+    private String description;
     @NotBlank(message = "incorrect releaseDate")
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "invalid format releaseDate")
-    String releaseDate;
+    private String releaseDate;
     @NotNull
     @Positive
-    int duration;
-    int rate = 0;
-    Set<Integer> likes = new HashSet<>();
+    private int duration;
+    private Set<Long> likes = new HashSet<>();
 
-    public void addLike(int userId) {
-        rate++;
+    public void addLike(long userId) {
         likes.add(userId);
     }
 
-    public void removeLike(int userId) {
-        rate--;
+    public void removeLike(long userId) {
         likes.remove(userId);
     }
 
     public static final Comparator<Film>
-            COMPARE_BY_RATE = (film1, film2) -> film2.getRate() - film1.getRate();
+            COMPARE_BY_RATE = (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();
 }
