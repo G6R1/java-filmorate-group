@@ -2,16 +2,13 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
+
 public class Film {
     @NotBlank(message = "incorrect name")
     private String name;
@@ -25,16 +22,20 @@ public class Film {
     @NotNull
     @Positive
     private int duration;
-    private Set<Long> likes = new HashSet<>();
+    private RateMpa mpa = new RateMpa();
+    private Set<Genre> genres;
+    private Set<Long> rateUsers = new HashSet<>();
+
 
     public void addLike(long userId) {
-        likes.add(userId);
+        rateUsers.add(userId);
     }
 
     public void removeLike(long userId) {
-        likes.remove(userId);
+        rateUsers.remove(userId);
     }
 
     public static final Comparator<Film>
-            COMPARE_BY_RATE = (film1, film2) -> film2.getLikes().size() - film1.getLikes().size();
+            COMPARE_BY_RATE = (film1, film2) -> film2.getRateUsers().size() -
+            film1.getRateUsers().size();
 }

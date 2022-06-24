@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import javax.validation.ConstraintViolationException;
+import java.sql.SQLException;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -30,5 +31,10 @@ public class ErrorHandler {
     @ExceptionHandler
     public ResponseEntity<String> handleValidationException(ValidationException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handleSQLException(SQLException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

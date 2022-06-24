@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.RateMpa;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,6 +26,7 @@ class FilmControllerTest {
         film.setDescription("FilmTest");
         film.setReleaseDate("1945-09-05");
         film.setDuration(30);
+        film.setMpa(new RateMpa());
         String json = mapper.writeValueAsString(film);
         mockMvc.perform(post("/films").content(json).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

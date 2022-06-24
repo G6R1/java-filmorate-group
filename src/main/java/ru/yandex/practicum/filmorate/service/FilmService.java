@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RateMpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -15,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
+
+    @Qualifier("FilmDbStorage")
     private FilmStorage filmStorage;
     private UserService userService;
 
@@ -22,6 +27,24 @@ public class FilmService {
     public FilmService(FilmStorage filmStorage, UserService userService) {
         this.filmStorage = filmStorage;
         this.userService = userService;
+    }
+
+    public List<RateMpa> getAllMpa() {
+        return filmStorage.getAllMpa();
+    }
+
+    public RateMpa getMpa(int id) {
+        return filmStorage.getRateMpa(id)
+                .orElseThrow(() -> new NotFoundException("такого рейтинга не существует"));
+    }
+
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
+
+    public Genre getGenre(int id) {
+        return filmStorage.getGenre(id)
+                .orElseThrow(() -> new NotFoundException("такого жанра не существует"));
     }
 
     public Film getFilm(long filmId) {
@@ -62,16 +85,17 @@ public class FilmService {
     public Film removeLike(long filmId, long userId) {
         User user = userService.getUser(userId);
         Film film = getFilm(filmId);
-        if (!film.getLikes().contains(userId))
+        if (!film.getRateUsers().contains(userId))
             throw new NotFoundException("пользователь не ставил лайков");
-            film.removeLike(user.getId());
+        film.removeLike(user.getId());
+        filmStorage.updateFilm(film);
         return film;
     }
 
     public List<Film> getPopular(int count) {
         List<Film> popular = getFilms();
         popular.sort(Film.COMPARE_BY_RATE);
-            return popular.stream().limit(count).collect(Collectors.toList());
+        return popular.stream().limit(count).collect(Collectors.toList());
     }
 
     private void validate(Film film) {

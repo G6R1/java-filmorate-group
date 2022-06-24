@@ -24,6 +24,7 @@ public class User {
     private Set<Long> friends = new HashSet<>();
 
     public void addFriend(long friendId) {
+
         friends.add(friendId);
     }
 

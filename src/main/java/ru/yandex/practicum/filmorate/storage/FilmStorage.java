@@ -1,11 +1,22 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.RateMpa;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface FilmStorage {
+
+    List<RateMpa> getAllMpa();
+
+    Optional<RateMpa> getRateMpa(int mpaId);
+
+    List<Genre> getAllGenres();
+
+    Optional<Genre> getGenre(int genreId);
 
     //создаёт фильм
     void createFilm(Film film);
