@@ -19,6 +19,6 @@ public interface UserStorage {
     //удаляет пользователя по идентификатору
     void removeUser(long userId);
 
-    //возвращает список пользователей
+    //возвращает список всех пользователей
     Map<Long, User> getUsers();
 }
