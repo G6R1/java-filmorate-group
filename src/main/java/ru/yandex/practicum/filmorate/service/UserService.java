@@ -28,7 +28,7 @@ public class UserService {
     }
 
     public User getUser(long userId) {
-        return userStorage.getUser(userId)
+        return userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("такого пользователя нет в списке"));
     }
 

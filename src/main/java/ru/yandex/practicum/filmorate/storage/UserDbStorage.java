@@ -47,7 +47,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Optional<User> getUser(long userId) {
+    public Optional<User> findUserById(long userId) {
         String sql = "select * from user_user where user_id = ?";
         try {
             User user = jdbcTemplate.queryForObject(sql, this::makeUser, userId);
