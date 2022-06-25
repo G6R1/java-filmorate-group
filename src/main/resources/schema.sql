@@ -29,7 +29,6 @@ CREATE TABLE IF NOT EXISTS rate_users (
  user_id BIGINT
 );
 
-
 CREATE TABLE IF NOT EXISTS user_friends (
  user_id BIGINT,
  friend_id BIGINT,

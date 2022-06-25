@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.RateMpa;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Qualifier("InMemoryFilmStorage")
@@ -19,22 +16,22 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<RateMpa> getAllMpa() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public Optional<RateMpa> getRateMpa(int mpaId) {
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public List<Genre> getAllGenres() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
     public Optional<Genre> getGenre(int genreId) {
-        return null;
+        return Optional.empty();
     }
 
     @Override

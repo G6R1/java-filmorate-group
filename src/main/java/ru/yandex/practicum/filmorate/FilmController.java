@@ -100,5 +100,4 @@ public class FilmController {
     public RateMpa getMpa(@PathVariable int id) {
         return filmService.getMpa(id);
     }
-
 }
