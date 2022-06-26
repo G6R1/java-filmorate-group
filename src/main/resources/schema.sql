@@ -24,21 +24,21 @@ CREATE TABLE IF NOT EXISTS films (
   genre_id INTEGER REFERENCES genres (genre_id)
  );
 
-CREATE TABLE IF NOT EXISTS rate_users (
- film_id BIGINT REFERENCES films (film_id),
- user_id BIGINT
-);
-
-CREATE TABLE IF NOT EXISTS user_friends (
- user_id BIGINT,
- friend_id BIGINT,
- friend_status BOOlEAN
-);
-
 CREATE TABLE IF NOT EXISTS user_user (
- user_login VARCHAR(50) NOT NULL UNIQUE,
  user_name VARCHAR(50),
+ user_login VARCHAR(50) NOT NULL UNIQUE,
  user_id BIGINT PRIMARY KEY AUTO_INCREMENT,
  user_email VARCHAR(50),
  user_birthday VARCHAR(50) NOT NULL
  );
+
+CREATE TABLE IF NOT EXISTS rate_users (
+ film_id BIGINT REFERENCES films (film_id),
+ user_id BIGINT REFERENCES user_user(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_friends (
+ user_id BIGINT REFERENCES user_user (user_id),
+ friend_id BIGINT,
+ friend_status BOOlEAN
+);

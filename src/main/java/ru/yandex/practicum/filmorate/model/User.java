@@ -10,10 +10,10 @@ import java.util.Set;
 
 @Data
 public class User {
+    private String name;
     @NotBlank(message = "login blank")
     @Pattern(regexp = "\\S*$")
     private String login;
-    private String name;
     private long id;
     @NotBlank(message = "email blank")
     @Email(message = "invalid email")

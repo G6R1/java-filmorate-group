@@ -22,7 +22,8 @@ public class Film {
     @NotNull
     @Positive
     private int duration;
-    private RateMpa mpa = new RateMpa();
+    @NotNull
+    private RateMpa mpa;
     private Set<Genre> genres;
     private Set<Long> rateUsers = new HashSet<>();
 
