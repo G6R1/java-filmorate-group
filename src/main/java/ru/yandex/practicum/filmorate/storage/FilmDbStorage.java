@@ -66,7 +66,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> getFilm(long filmId) {
-        String sql = "select * from films where film_id = ?";
+        String sql = "select* from films join rate_mpa using(mpa_id) where film_id = ?";
         try {
             Film film = jdbcTemplate.queryForObject(sql, this::makeFilm, filmId);
             return Optional.ofNullable(film);
@@ -101,15 +101,13 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilm(long filmId) {
-        filmGenreStorage.removeFilmGenre(filmId);
-        rateUserStorage.removeRateUsers(filmId);
         String sqlQuery = "delete from films where id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
     @Override
     public Map<Long, Film> getFilms() {
-        String sqlQuery = "select * from films";
+        String sqlQuery = "select* from films join rate_mpa using(mpa_id)";
         return jdbcTemplate.query(sqlQuery, this::makeFilm)
                 .stream().collect(Collectors.toMap(Film::getId, item -> item));
     }
