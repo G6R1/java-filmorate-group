@@ -4,7 +4,6 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -25,18 +24,9 @@ public class Film {
     @NotNull
     private RateMpa mpa;
     private Set<Genre> genres;
-    private Set<Long> rateUsers = new HashSet<>();
-
-
-    public void addLike(long userId) {
-        rateUsers.add(userId);
-    }
-
-    public void removeLike(long userId) {
-        rateUsers.remove(userId);
-    }
+    private int rateUsers;
 
     public static final Comparator<Film>
-            COMPARE_BY_RATE = (film1, film2) -> film2.getRateUsers().size() -
-            film1.getRateUsers().size();
+            COMPARE_BY_RATE = (film1, film2) -> film2.getRateUsers() -
+            film1.getRateUsers();
 }

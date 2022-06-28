@@ -30,15 +30,13 @@ public class RateUserDbStorage implements RateUserStorage {
         return rate.stream().map(RateUsers::getUserId).collect(Collectors.toSet());
     }
 
-    public void addRateUsers(long filmId, Set<Long> userRate) {
-        userRate.forEach(rateUser -> {
-            String sql = "insert into rate_users(film_id, user_id) " + "values (?, ?)";
-            jdbcTemplate.update(sql, filmId, rateUser);
-        });
+    public void addRateUser(long filmId, long userId) {
+        String sql = "insert into rate_users(film_id, user_id) " + "values (?, ?)";
+        jdbcTemplate.update(sql, filmId, userId);
     }
 
-    public void removeRateUsers(long filmId) {
-        String sql = "delete from rate_users where film_id = ?";
-        jdbcTemplate.update(sql, filmId);
+    public void removeRateUser(long filmId, long userId) {
+        String sql = "delete from rate_users where film_id = ? and user_id = ?";
+        jdbcTemplate.update(sql, filmId, userId);
     }
 }

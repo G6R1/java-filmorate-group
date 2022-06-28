@@ -6,15 +6,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.*;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RateMpa;
+import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,23 +20,12 @@ import java.util.stream.Collectors;
 
 @Component
 public class FilmDbStorage implements FilmStorage {
-    private FilmGenreStorage filmGenreStorage;
-    private GenreStorage genreStorage;
-    private MpaStorage mpaStorage;
-    private RateUserStorage rateUserStorage;
+    private MpaService mpaService;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbStorage(
-            FilmGenreStorage filmGenreStorage
-            , GenreStorage genreStorage
-            , MpaStorage mpaStorage
-            , RateUserStorage rateUserStorage
-            , JdbcTemplate jdbcTemplate) {
-        this.filmGenreStorage = filmGenreStorage;
-        this.genreStorage = genreStorage;
-        this.mpaStorage = mpaStorage;
-        this.rateUserStorage = rateUserStorage;
+    public FilmDbStorage(MpaService mpaService, JdbcTemplate jdbcTemplate) {
+        this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -57,11 +44,6 @@ public class FilmDbStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-        if (film.getGenres() != null) {
-            filmGenreStorage.addFilmGenre(film.getId(), film.getGenres());
-        }
-        if (film.getRateUsers() != null)
-            rateUserStorage.addRateUsers(film.getId(), film.getRateUsers());
     }
 
     @Override
@@ -87,16 +69,6 @@ public class FilmDbStorage implements FilmStorage {
                 , film.getDuration()
                 , film.getMpa().getId()
                 , film.getId());
-        filmGenreStorage.removeFilmGenre(film.getId());
-        rateUserStorage.removeRateUsers(film.getId());
-        if (film.getGenres() != null) {
-            filmGenreStorage.addFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(filmGenreStorage.getFilmGenres(film.getId()));
-        }
-        if (film.getRateUsers() != null) {
-            rateUserStorage.addRateUsers(film.getId(), film.getRateUsers());
-            film.setRateUsers(rateUserStorage.getRateUsers(film.getId()));
-        }
     }
 
     @Override
@@ -119,32 +91,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setDescription(resultSet.getString("film_description"));
         film.setReleaseDate(resultSet.getString("film_release_date"));
         film.setDuration(resultSet.getInt("film_duration"));
-        film.setMpa(getRateMpa(resultSet.getInt("mpa_id")).orElse(new RateMpa()));
-        if (!filmGenreStorage.getFilmGenres(film.getId()).isEmpty()) {
-            film.setGenres(filmGenreStorage.getFilmGenres(film.getId()));
-        }
-        if (!rateUserStorage.getRateUsers(film.getId()).isEmpty()) {
-            film.setRateUsers(rateUserStorage.getRateUsers(film.getId()));
-        }
+        film.setMpa(mpaService.getMpa(resultSet.getInt("mpa_id")));
         return film;
-    }
-
-    @Override
-    public Optional<Genre> getGenre(int genreId) {
-        return genreStorage.getGenre(genreId);
-    }
-
-    @Override
-    public List<Genre> getAllGenres() {
-        return genreStorage.getAllGenres();
-    }
-
-    public Optional<RateMpa> getRateMpa(int mpaId) {
-        return mpaStorage.getRateMpa(mpaId);
-    }
-
-    @Override
-    public List<RateMpa> getAllMpa() {
-        return mpaStorage.getAllMpa();
     }
 }

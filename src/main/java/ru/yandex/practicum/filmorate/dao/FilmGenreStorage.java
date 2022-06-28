@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.FilmGenre;
 
-import java.util.Set;
+import java.util.List;
 
 public interface FilmGenreStorage {
 
-    Set<Genre> getFilmGenres(long filmId);
+    List<FilmGenre> getFilmGenres(long filmId);
 
-    void addFilmGenre(long filmId, Set<Genre> genres);
+    void addFilmGenre(long filmId, int genreId);
 
     void removeFilmGenre(long filmId);
 }

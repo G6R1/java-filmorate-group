@@ -70,24 +70,4 @@ public class FilmController {
     public List<Film> getPopular(@Positive @RequestParam(defaultValue = "10", required = false) int count) {
         return filmService.getPopular(count);
     }
-
-    @GetMapping("/genres")
-    public Collection<Genre> getGenres() {
-        return filmService.getAllGenres();
-    }
-
-    @GetMapping("/genres/{id}")
-    public Genre getGenre(@PathVariable int id) {
-        return filmService.getGenre(id);
-    }
-
-    @GetMapping("/mpa")
-    public Collection<RateMpa> getAllMpa() {
-        return filmService.getAllMpa();
-    }
-
-    @GetMapping("/mpa/{id}")
-    public RateMpa getMpa(@PathVariable int id) {
-        return filmService.getMpa(id);
-    }
 }

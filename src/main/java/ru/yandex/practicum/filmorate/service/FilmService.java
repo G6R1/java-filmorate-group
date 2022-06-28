@@ -2,13 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RateMpa;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.dao.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -17,47 +15,52 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
+    private FilmGenreService filmGenreService;
     private FilmStorage filmStorage;
+    private RateUserService rateUserService;
     private UserService userService;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserService userService) {
+    public FilmService(
+            FilmGenreService filmGenreService
+            , FilmStorage filmStorage
+            , RateUserService rateUserService
+            , UserService userService) {
+        this.filmGenreService = filmGenreService;
         this.filmStorage = filmStorage;
+        this.rateUserService = rateUserService;
         this.userService = userService;
     }
 
-    public List<RateMpa> getAllMpa() {
-        return filmStorage.getAllMpa();
-    }
-
-    public RateMpa getMpa(int id) {
-        return filmStorage.getRateMpa(id)
-                .orElseThrow(() -> new NotFoundException("такого рейтинга не существует"));
-    }
-
-    public List<Genre> getAllGenres() {
-        return filmStorage.getAllGenres();
-    }
-
-    public Genre getGenre(int id) {
-        return filmStorage.getGenre(id)
-                .orElseThrow(() -> new NotFoundException("такого жанра не существует"));
-    }
-
     public Film getFilm(long filmId) {
-        return filmStorage.getFilm(filmId)
-                .orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
+        Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
+        if (!filmGenreService.getFilmGenres(film.getId()).isEmpty()) {
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
+        if (!rateUserService.getRateUsers(film.getId()).isEmpty()) {
+            film.setRateUsers(rateUserService.getRateUsers(film.getId()).size());
+        }
+        return film;
     }
 
     public Film createFilm(Film film) {
         validate(film);
         filmStorage.createFilm(film);
+        if (film.getGenres() != null) {
+            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
         return film;
     }
 
     public Film updateFilm(Film film) {
         validate(film);
         getFilm(film.getId());
+        filmGenreService.removeFilmGenre(film.getId());
+        if (film.getGenres() != null) {
+            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
         filmStorage.updateFilm(film);
         return film;
     }
@@ -74,23 +77,25 @@ public class FilmService {
     public Film addLike(long filmId, long userId) {
         Film film = getFilm(filmId);
         User user = userService.getUser(userId);
-        film.addLike(user.getId());
+        rateUserService.addRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
-        return film;
+        return getFilm(filmId);
     }
 
     public Film removeLike(long filmId, long userId) {
         User user = userService.getUser(userId);
         Film film = getFilm(filmId);
-        if (!film.getRateUsers().contains(userId))
+        if (!rateUserService.getRateUsers(filmId).contains(userId))
             throw new NotFoundException("пользователь не ставил лайков");
-        film.removeLike(user.getId());
+        rateUserService.removeRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
-        return film;
+        return getFilm(filmId);
     }
 
     public List<Film> getPopular(int count) {
-        List<Film> popular = getFilms();
+        List<Film> films = getFilms();
+        List<Film> popular = new ArrayList<>();
+        films.forEach(film -> popular.add(getFilm(film.getId())));
         popular.sort(Film.COMPARE_BY_RATE);
         return popular.stream().limit(count).collect(Collectors.toList());
     }

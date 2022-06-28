@@ -6,7 +6,7 @@ public interface RateUserStorage {
 
     Set<Long> getRateUsers(long filmId);
 
-    void addRateUsers(long filmId, Set<Long> userRate);
+    void addRateUser(long filmId, long userId);
 
-    void removeRateUsers(long filmId);
+    void removeRateUser(long filmId, long userId);
 }
