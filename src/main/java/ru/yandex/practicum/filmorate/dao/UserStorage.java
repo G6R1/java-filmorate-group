@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -11,7 +11,7 @@ public interface UserStorage {
     void createUser(User user);
 
     //возвращает пользователя по идентификатору
-    Optional<User> getUser(long userId);
+    Optional<User> findUserById(long userId);
 
     //обновляет пользователя
     void updateUser(User user);
@@ -19,6 +19,6 @@ public interface UserStorage {
     //удаляет пользователя по идентификатору
     void removeUser(long userId);
 
-    //возвращает список пользователей
+    //возвращает список всех пользователей
     Map<Long, User> getUsers();
 }

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +12,7 @@ import javax.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class ErrorHandler {
+
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException e) {
         return new ResponseEntity<>("неверное значение параметра: " + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -29,6 +30,11 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleValidationException(ValidationException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<String> handleSQLException(Throwable e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.dao.UserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class UserService {
     }
 
     public User getUser(long userId) {
-        return userStorage.getUser(userId)
+        return userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("такого пользователя нет в списке"));
     }
 
@@ -51,8 +51,6 @@ public class UserService {
     public User addFriend(long userId, long friendId) {
         User userFriend = getUser(friendId);
         User user = getUser(userId);
-        userFriend.addFriend(userId);
-        userStorage.updateUser(userFriend);
         user.addFriend(friendId);
         userStorage.updateUser(user);
         return user;
@@ -61,12 +59,11 @@ public class UserService {
     public User removeFriend(long userId, long friendId) {
         User user = getUser(userId);
         User userFriend = getUser(friendId);
-        if (!user.getFriends().contains(friendId) || !userFriend.getFriends().contains(userId))
+        if (!user.getFriends().contains(friendId))
             throw new NotFoundException("список друзей отсутствует");
         user.removeFriend(friendId);
-        userFriend.removeFriend(userId);
         userStorage.updateUser(user);
-        userStorage.updateUser(userFriend);
+
         return user;
     }
 
