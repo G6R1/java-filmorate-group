@@ -6,13 +6,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.service.FilmDirectorService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
+import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,12 +27,15 @@ import java.util.stream.Collectors;
 @Component
 public class FilmDbStorage implements FilmStorage {
     private MpaService mpaService;
+    private FilmDirectorService filmDirectorService;
+
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbStorage(MpaService mpaService, JdbcTemplate jdbcTemplate) {
+    public FilmDbStorage(MpaService mpaService, JdbcTemplate jdbcTemplate, FilmDirectorService filmDirectorService) {
         this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
+        this.filmDirectorService = filmDirectorService;
     }
 
     @Override
@@ -92,6 +101,12 @@ public class FilmDbStorage implements FilmStorage {
         film.setReleaseDate(resultSet.getString("film_release_date"));
         film.setDuration(resultSet.getInt("film_duration"));
         film.setMpa(mpaService.getMpa(resultSet.getInt("mpa_id")));
+        film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
         return film;
+    }
+
+    @Override
+    public List<Film> getListFilmsByDirector(int id, Map<Data, String> sortBy) {
+        return null;
     }
 }

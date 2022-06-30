@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.*;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -23,6 +24,7 @@ public class Film {
     private int duration;
     @NotNull
     private RateMpa mpa;
+    private Set<Director> directors;
     private Set<Genre> genres;
     private int rateUsers;
 

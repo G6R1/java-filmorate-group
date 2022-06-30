@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.DirectorStorage;
+import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.DirectorDbStorage;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,17 +24,27 @@ public class FilmService {
     private FilmStorage filmStorage;
     private RateUserService rateUserService;
     private UserService userService;
+    private FilmDirectorService filmDirectorService;
+
+    private FilmDirectorStorage filmDirectorStorage;
+
+    JdbcTemplate jdbcTemplate;
 
     @Autowired
     public FilmService(
             FilmGenreService filmGenreService
             , FilmStorage filmStorage
             , RateUserService rateUserService
-            , UserService userService) {
+            , UserService userService, JdbcTemplate jdbcTemplate
+            , FilmDirectorService filmDirectorService, FilmDirectorStorage filmDirectorStorage) {
         this.filmGenreService = filmGenreService;
         this.filmStorage = filmStorage;
         this.rateUserService = rateUserService;
         this.userService = userService;
+        this.jdbcTemplate = jdbcTemplate;
+        this.filmDirectorService = filmDirectorService;
+        this.filmDirectorStorage = filmDirectorStorage;
+
     }
 
     public Film getFilm(long filmId) {
@@ -40,6 +55,9 @@ public class FilmService {
         if (!rateUserService.getRateUsers(film.getId()).isEmpty()) {
             film.setRateUsers(rateUserService.getRateUsers(film.getId()).size());
         }
+        if (!filmDirectorService.getFilmDirector(film.getId()).isEmpty()) {
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
         return film;
     }
 
@@ -49,6 +67,10 @@ public class FilmService {
         if (film.getGenres() != null) {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
+        if (film.getDirectors() != null){
+            filmDirectorService.addFilmDirector(film.getId(), film.getDirectors());
+            film.setDirectors((Set<Director>) filmDirectorService.getFilmDirector(film.getId()));
         }
         return film;
     }
@@ -61,7 +83,13 @@ public class FilmService {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         }
-        filmStorage.updateFilm(film);
+        if (film.getDirectors() == null) {
+            filmDirectorService.removeFilmDirector(film.getId());
+            film.setDirectors(null);
+        } else {
+            filmDirectorService.addFilmDirector(film.getId(), film.getDirectors());
+            film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
+        }
         return film;
     }
 
@@ -104,4 +132,11 @@ public class FilmService {
         if (LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28)))
             throw new ValidationException("неправильный фильм");
     }
+
+    public List<Film> getFilmsByDirector(int directorId, Collection<String> sort){
+        List<Film> allFilms = getFilms();
+
+        return allFilms;
+    }
+
 }

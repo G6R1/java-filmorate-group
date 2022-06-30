@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -70,4 +72,5 @@ public class FilmController {
     public List<Film> getPopular(@Positive @RequestParam(defaultValue = "10", required = false) int count) {
         return filmService.getPopular(count);
     }
+
 }
