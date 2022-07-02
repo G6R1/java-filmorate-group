@@ -13,13 +13,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.service.DirectorService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -39,10 +38,8 @@ public class DirectorDbStorage implements DirectorStorage {
         jdbcInsert.withTableName("directors").usingGeneratedKeyColumns("director_id");
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("name_director", director.getName());
-
         Number num = jdbcInsert.executeAndReturnKey(parameters);
         director.setId(num.intValue());
-
         return director;
     }
 
@@ -61,9 +58,6 @@ public class DirectorDbStorage implements DirectorStorage {
         if (director1.getId() == 0) {
             throw new NotFoundException("Режиссер с ID# " + director.getId() + " не найден");
         } else {
-//            String sqlQuery2 = "DELETE FROM directors WHERE director_id = ?";
-//            jdbcTemplate.update(sqlQuery2, director.getId());
-
             String sql = "UPDATE directors set " +
                     "name_director =? WHERE DIRECTOR_ID = ?";
             jdbcTemplate.update(sql, director.getName(), director.getId());
@@ -72,14 +66,15 @@ public class DirectorDbStorage implements DirectorStorage {
     }
 
     @Override
-    public Optional<Director> removeDirector(int id) {
+    public void removeDirector(int id) {
         if (id <= 0) {
             throw new NotFoundException("ID меньше или равно 0");
         }
-        Optional<Director> director = getDirector(id);
+        String sql2 = "DELETE FROM film_director WHERE director_id = ?";
+        jdbcTemplate.update(sql2, id);
         String sql = "DELETE FROM directors WHERE director_id = ?";
         jdbcTemplate.update(sql, id);
-        return director;
+
     }
 
     @Override
@@ -111,13 +106,5 @@ public class DirectorDbStorage implements DirectorStorage {
         director.setId(resultSet.getInt("director_id"));
         director.setName(resultSet.getString("name_director"));
         return director;
-    }
-
-    public void addDirector(Set<Director> listDirectors){
-        for(Director director: listDirectors){
-            jdbcTemplate.update("UPDATE directors set name_director =? WHERE DIRECTOR_ID = ?", director.getName(),
-                    director.getId());
-        }
-
     }
 }

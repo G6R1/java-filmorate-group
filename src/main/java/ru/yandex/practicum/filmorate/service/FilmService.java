@@ -2,20 +2,18 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.DirectorStorage;
 import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.DirectorDbStorage;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,12 +49,14 @@ public class FilmService {
         Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
         if (!filmGenreService.getFilmGenres(film.getId()).isEmpty()) {
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        } else {
+            film.setGenres(null);
         }
         if (!rateUserService.getRateUsers(film.getId()).isEmpty()) {
             film.setRateUsers(rateUserService.getRateUsers(film.getId()).size());
         }
         if (!filmDirectorService.getFilmDirector(film.getId()).isEmpty()) {
-            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+            film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
         }
         return film;
     }
@@ -68,27 +68,35 @@ public class FilmService {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         }
-        if (film.getDirectors() != null){
+        if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirector(film.getId(), film.getDirectors());
-            film.setDirectors((Set<Director>) filmDirectorService.getFilmDirector(film.getId()));
+            film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
         }
         return film;
     }
 
     public Film updateFilm(Film film) {
+        if (film.getId() <= 0) {
+            throw new NotFoundException("ID меньше или равно 0");
+        }
         validate(film);
-        getFilm(film.getId());
+        filmStorage.updateFilm(film);
         filmGenreService.removeFilmGenre(film.getId());
         if (film.getGenres() != null) {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         }
-        if (film.getDirectors() == null) {
-            filmDirectorService.removeFilmDirector(film.getId());
-            film.setDirectors(null);
-        } else {
+        if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirector(film.getId(), film.getDirectors());
             film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
+        } else {
+            filmDirectorService.removeFilmDirector(film.getId());
+        }
+        if (film.getRateUsers() != 0) {
+            rateUserService.addRateUser(film.getId(), film.getRateUsers());
+            film.setRateUsers(film.getRateUsers());
+        } else {
+            film.setRateUsers(0);
         }
         return film;
     }
@@ -133,7 +141,7 @@ public class FilmService {
             throw new ValidationException("неправильный фильм");
     }
 
-    public List<Film> getFilmsByDirector(int directorId, Collection<String> sort){
+    public List<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
         List<Film> allFilms = getFilms();
 
         return allFilms;

@@ -10,9 +10,13 @@ public interface FilmDirectorStorage {
 
     List<FilmDirector> getFilmDirector(long filmId);
 
-    void addFilmDirector(long filmId, int genreId);
+    void addFilmDirector(long filmId, int directorId);
 
     void removeFilmDirector(long filmId);
 
-    Collection <Film> getFilmsByDirector(int directorId, Collection<String> sort);
+    Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy);
+
+
+
+
 }

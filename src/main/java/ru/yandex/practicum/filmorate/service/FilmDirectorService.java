@@ -3,15 +3,12 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
-import ru.yandex.practicum.filmorate.dao.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmDirector;
-import ru.yandex.practicum.filmorate.model.FilmGenre;
-import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.Comparator;
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +28,6 @@ public class FilmDirectorService {
                 .stream()
                 .map(FilmDirector::getDirectorId)
                 .map(directorService::getDirector)
-                .sorted(Comparator.comparing(Director::getId))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
@@ -41,5 +37,9 @@ public class FilmDirectorService {
 
     void removeFilmDirector(long filmId) {
         filmDirectorStorage.removeFilmDirector(filmId);
+    }
+
+    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
+        return filmDirectorStorage.getFilmsByDirector(directorId, sort);
     }
 }

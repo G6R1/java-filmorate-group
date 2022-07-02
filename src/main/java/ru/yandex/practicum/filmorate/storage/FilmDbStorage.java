@@ -8,10 +8,9 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.FilmDirectorService;
+import ru.yandex.practicum.filmorate.service.FilmGenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import javax.xml.crypto.Data;
@@ -28,14 +27,18 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
     private MpaService mpaService;
     private FilmDirectorService filmDirectorService;
-
+    private FilmDirectorStorage filmDirectorStorage;
     private final JdbcTemplate jdbcTemplate;
+    private FilmGenreService filmGenreService;
 
     @Autowired
-    public FilmDbStorage(MpaService mpaService, JdbcTemplate jdbcTemplate, FilmDirectorService filmDirectorService) {
+    public FilmDbStorage(MpaService mpaService, JdbcTemplate jdbcTemplate, FilmDirectorService filmDirectorService,
+                         FilmDirectorStorage filmDirectorStorage, FilmGenreService filmGenreService) {
         this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
         this.filmDirectorService = filmDirectorService;
+        this.filmDirectorStorage = filmDirectorStorage;
+        this.filmGenreService = filmGenreService;
     }
 
     @Override
@@ -58,6 +61,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Optional<Film> getFilm(long filmId) {
         String sql = "select* from films join rate_mpa using(mpa_id) where film_id = ?";
+
         try {
             Film film = jdbcTemplate.queryForObject(sql, this::makeFilm, filmId);
             return Optional.ofNullable(film);
@@ -82,7 +86,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilm(long filmId) {
-        String sqlQuery = "delete from films where id = ?";
+        String sqlQuery = "delete from films where film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
@@ -101,7 +105,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setReleaseDate(resultSet.getString("film_release_date"));
         film.setDuration(resultSet.getInt("film_duration"));
         film.setMpa(mpaService.getMpa(resultSet.getInt("mpa_id")));
-        film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
+        film.setDirectors(filmDirectorService.getFilmDirector(resultSet.getLong("film_id")));
         return film;
     }
 

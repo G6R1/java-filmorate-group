@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS films (
  film_description VARCHAR(200),
  film_duration INTEGER NOT NULL,
  mpa_id INTEGER,
- director_id INTEGER,
  CONSTRAINT fk_mpa FOREIGN KEY (mpa_id) REFERENCES  rate_mpa (mpa_id)
  );
 

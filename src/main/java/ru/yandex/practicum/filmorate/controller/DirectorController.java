@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.DirectorService;
+import ru.yandex.practicum.filmorate.service.FilmDirectorService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -25,14 +26,14 @@ public class DirectorController {
     private final DirectorStorage directorStorage;
     private final DirectorService directorService;
 
-    private final FilmDirectorStorage filmDirectorStorage;
+    private final FilmDirectorService filmDirectorService;
 
     @Autowired
     public DirectorController(DirectorStorage directorStorage, DirectorService directorService,
-                              FilmDirectorStorage filmDirectorStorage) {
+                              FilmDirectorService filmDirectorService) {
         this.directorStorage = directorStorage;
         this.directorService = directorService;
-        this.filmDirectorStorage = filmDirectorStorage;
+        this.filmDirectorService = filmDirectorService;
     }
 
     @PostMapping("/directors")
@@ -66,17 +67,17 @@ public class DirectorController {
     }
 
     @DeleteMapping("/directors/{id}")
-    public Optional<Director> removeDirectorById(@PathVariable int id) {
+    public void removeDirectorById(@PathVariable int id) {
         log.info("Получен запрос на удаление данных режиссера");
         if (id <= 0) {
             throw new NotFoundException("ID режиссера меньше или равно 0");
         }
-        return directorStorage.removeDirector(id);
+       directorStorage.removeDirector(id);
     }
 
     @GetMapping("/films/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable int directorId,
-                                               @RequestParam Collection<String> sort){
-        return filmDirectorStorage.getFilmsByDirector(directorId, sort);
+                                               @RequestParam Collection<String> sortBy) {
+        return filmDirectorService.getFilmsByDirector(directorId, sortBy);
     }
 }
