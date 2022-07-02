@@ -21,6 +21,4 @@ public interface FilmStorage {
 
     //возвращает список фильмов
     Map<Long, Film> getFilms();
-
-    public void checkFilmId(long id);
 }

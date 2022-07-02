@@ -44,6 +44,7 @@ public class UserService {
     }
 
     public void removeUser(long userId) {
+        getUser(userId);
         userStorage.removeUser(userId);
     }
 
