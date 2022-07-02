@@ -66,7 +66,6 @@ public class FilmService {
     }
 
     public void removeFilm(long filmId) {
-        getFilm(filmId);
         filmStorage.removeFilm(filmId);
     }
 

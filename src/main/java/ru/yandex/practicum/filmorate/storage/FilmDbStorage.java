@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
@@ -73,8 +77,10 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilm(long filmId) {
-        String sqlQuery = "delete from films where id = ?";
+        checkFilmId(filmId);
+        String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, filmId);
+
     }
 
     @Override
@@ -82,6 +88,12 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "select* from films join rate_mpa using(mpa_id)";
         return jdbcTemplate.query(sqlQuery, this::makeFilm)
                 .stream().collect(Collectors.toMap(Film::getId, item -> item));
+    }
+
+    @Override
+    public void checkFilmId(long id) {
+        SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from FILMS where FILM_ID = ?", id);
+        if (!rows.next()) throw new NotFoundException("Такого фильма не существует");
     }
 
     private Film makeFilm(ResultSet resultSet, int rowNum) throws SQLException {

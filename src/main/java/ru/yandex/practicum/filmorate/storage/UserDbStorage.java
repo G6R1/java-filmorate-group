@@ -1,12 +1,16 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.dao.UserFriendStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
@@ -75,8 +79,14 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void removeUser(long userId) {
-        String sqlQuery = "delete from user_user where id = ?";
+        checkId(userId);
+        String sqlQuery = "DELETE FROM USER_USER WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery, userId);
+    }
+
+    public void checkId(long id){
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from USER_USER where USER_ID = ?", id);
+        if (!userRows.next()) throw new NotFoundException("Такого пользователя не существует");
     }
 
     @Override
