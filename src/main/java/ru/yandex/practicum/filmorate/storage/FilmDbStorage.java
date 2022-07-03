@@ -61,7 +61,6 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Optional<Film> getFilm(long filmId) {
         String sql = "select* from films join rate_mpa using(mpa_id) where film_id = ?";
-
         try {
             Film film = jdbcTemplate.queryForObject(sql, this::makeFilm, filmId);
             return Optional.ofNullable(film);
@@ -86,7 +85,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilm(long filmId) {
-        String sqlQuery = "delete from films where film_id = ?";
+        String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, filmId);
     }
 
