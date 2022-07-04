@@ -1,12 +1,12 @@
-MERGE INTO GENRES KEY (genre_id) VALUES (1, 'РљРѕРјРµРґРёСЏ');
-MERGE INTO GENRES KEY (genre_id) VALUES (2, 'Р”СЂР°РјР°');
-MERGE INTO GENRES KEY (genre_id) VALUES (3, 'РњСѓР»СЊС‚С„РёР»СЊРј');
-MERGE INTO GENRES KEY (genre_id) VALUES (4, 'РўСЂРёР»Р»РµСЂ');
-MERGE INTO GENRES KEY (genre_id) VALUES (5, 'Р”РѕРєСѓРјРµРЅС‚Р°Р»СЊРЅС‹Р№');
-MERGE INTO GENRES KEY (genre_id) VALUES (6, 'Р‘РѕРµРІРёРє');
+MERGE INTO GENRES KEY (genre_id) VALUES (1, 'Комедия');
+MERGE INTO GENRES KEY (genre_id) VALUES (2, 'Драма');
+MERGE INTO GENRES KEY (genre_id) VALUES (3, 'Мультфильм');
+MERGE INTO GENRES KEY (genre_id) VALUES (4, 'Триллер');
+MERGE INTO GENRES KEY (genre_id) VALUES (5, 'Документальный');
+MERGE INTO GENRES KEY (genre_id) VALUES (6, 'Боевик');
 
-MERGE INTO RATE_MPA KEY (mpa_id) VALUES (1, 'G', 'Сѓ С„РёР»СЊРјР° РЅРµС‚ РІРѕР·СЂР°СЃС‚РЅС‹С… РѕРіСЂР°РЅРёС‡РµРЅРёР№');
-MERGE INTO RATE_MPA KEY (mpa_id) VALUES (2, 'PG', 'РґРµС‚СЏРј СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ СЃРјРѕС‚СЂРµС‚СЊ С„РёР»СЊРј СЃ СЂРѕРґРёС‚РµР»СЏРјРё');
-MERGE INTO RATE_MPA KEY (mpa_id) VALUES (3, 'PG-13', 'РґРµС‚СЏРј РґРѕ 13 Р»РµС‚ РїСЂРѕСЃРјРѕС‚СЂ РЅРµ Р¶РµР»Р°С‚РµР»РµРЅ');
-MERGE INTO RATE_MPA KEY (mpa_id) VALUES (4, 'R', 'Р»РёС†Р°Рј РґРѕ 17 Р»РµС‚ РїСЂРѕСЃРјР°С‚СЂРёРІР°С‚СЊ С„РёР»СЊРј РјРѕР¶РЅРѕ С‚РѕР»СЊРєРѕ РІ РїСЂРёСЃСѓС‚СЃС‚РІРёРё РІР·СЂРѕСЃР»РѕРіРѕ');
-MERGE INTO RATE_MPA KEY (mpa_id) VALUES (5, 'NC-17', 'Р»РёС†Р°Рј РґРѕ 18 Р»РµС‚ РїСЂРѕСЃРјРѕС‚СЂ Р·Р°РїСЂРµС‰С‘РЅ');
+MERGE INTO RATE_MPA KEY (mpa_id) VALUES (1, 'G', 'у фильма нет возрастных ограничений');
+MERGE INTO RATE_MPA KEY (mpa_id) VALUES (2, 'PG', 'детям рекомендуется смотреть фильм с родителями');
+MERGE INTO RATE_MPA KEY (mpa_id) VALUES (3, 'PG-13', 'детям до 13 лет просмотр не желателен');
+MERGE INTO RATE_MPA KEY (mpa_id) VALUES (4, 'R', 'лицам до 17 лет просматривать фильм можно только в присутствии взрослого');
+MERGE INTO RATE_MPA KEY (mpa_id) VALUES (5, 'NC-17', 'лицам до 18 лет просмотр запрещён');
