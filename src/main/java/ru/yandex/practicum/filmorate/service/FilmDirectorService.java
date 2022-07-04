@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
+import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmDirector;
@@ -39,7 +40,4 @@ public class FilmDirectorService {
         filmDirectorStorage.removeFilmDirector(filmId);
     }
 
-    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
-        return filmDirectorStorage.getFilmsByDirector(directorId, sort);
-    }
 }

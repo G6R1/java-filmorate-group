@@ -1,31 +1,30 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RateMpa;
+import ru.yandex.practicum.filmorate.service.FilmDirectorService;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 @Validated
 public class FilmController {
     private final FilmService filmService;
+    private final FilmDirectorService filmDirectorService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmService filmService, FilmDirectorService filmDirectorService) {
         this.filmService = filmService;
+        this.filmDirectorService = filmDirectorService;
     }
 
     @GetMapping("/films")
@@ -73,4 +72,9 @@ public class FilmController {
         return filmService.getPopular(count);
     }
 
+    @GetMapping("/films/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(@PathVariable int directorId,
+                                               @RequestParam Collection<String> sortBy) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
+    }
 }

@@ -5,18 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.dao.DirectorStorage;
-import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.DirectorService;
 import ru.yandex.practicum.filmorate.service.FilmDirectorService;
 
 import javax.validation.Valid;
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -26,14 +22,11 @@ public class DirectorController {
     private final DirectorStorage directorStorage;
     private final DirectorService directorService;
 
-    private final FilmDirectorService filmDirectorService;
-
     @Autowired
-    public DirectorController(DirectorStorage directorStorage, DirectorService directorService,
-                              FilmDirectorService filmDirectorService) {
+    public DirectorController(DirectorStorage directorStorage, DirectorService directorService) {
         this.directorStorage = directorStorage;
         this.directorService = directorService;
-        this.filmDirectorService = filmDirectorService;
+
     }
 
     @PostMapping("/directors")
@@ -73,11 +66,5 @@ public class DirectorController {
             throw new NotFoundException("ID режиссера меньше или равно 0");
         }
        directorStorage.removeDirector(id);
-    }
-
-    @GetMapping("/films/director/{directorId}")
-    public Collection<Film> getFilmsByDirector(@PathVariable int directorId,
-                                               @RequestParam Collection<String> sortBy) {
-        return filmDirectorService.getFilmsByDirector(directorId, sortBy);
     }
 }

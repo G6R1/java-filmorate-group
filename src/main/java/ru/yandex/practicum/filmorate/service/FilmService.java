@@ -76,10 +76,8 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        if (film.getId() <= 0) {
-            throw new NotFoundException("ID меньше или равно 0");
-        }
         validate(film);
+        getFilm(film.getId());
         filmStorage.updateFilm(film);
         filmGenreService.removeFilmGenre(film.getId());
         if (film.getGenres() != null) {
@@ -141,10 +139,7 @@ public class FilmService {
             throw new ValidationException("неправильный фильм");
     }
 
-    public List<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
-        List<Film> allFilms = getFilms();
-
-        return allFilms;
+    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
+       return filmStorage.getFilmsByDirector(directorId, sort);
     }
-
 }

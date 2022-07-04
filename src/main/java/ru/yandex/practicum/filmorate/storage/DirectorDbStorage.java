@@ -90,15 +90,8 @@ public class DirectorDbStorage implements DirectorStorage {
 
     @Override
     public List<Director> getListDirectors() {
-        List<Director> allDirectors = new ArrayList<>();
-        SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT * FROM directors ORDER BY director_id ASC");
-        while (genreRows.next()) {
-            Director director = new Director();
-            director.setId(genreRows.getInt("director_id"));
-            director.setName(genreRows.getString("name_director"));
-            allDirectors.add(director);
-        }
-        return allDirectors;
+        String sqlQuery = "SELECT * FROM directors ORDER BY director_id ASC";
+        return jdbcTemplate.query(sqlQuery, this::makeDirector);
     }
 
     private Director makeDirector(ResultSet resultSet, int rowNum) throws SQLException {

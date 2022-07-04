@@ -14,7 +14,7 @@ public interface FilmDirectorStorage {
 
     void removeFilmDirector(long filmId);
 
-    Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy);
+
 
 
 
