@@ -46,8 +46,6 @@ public class ReviewDBStorage implements ReviewStorage {
     @Override
     public Review update(Review review) {
 
-        getReviewById(review.getId());
-
         String sql = "update reviews set content = ?," +
                 " is_positive = ?" +
                 "WHERE review_id = ?";
@@ -63,7 +61,6 @@ public class ReviewDBStorage implements ReviewStorage {
 
     @Override
     public void remove(Long id) {
-        getReviewById(id);
         jdbcTemplate.update("delete from reviews where review_id = ?", id);
         log.info("Удалён отзыв: {}", id);
     }
@@ -88,13 +85,18 @@ public class ReviewDBStorage implements ReviewStorage {
 
     @Override
     public Collection<Review> getAllReviewsByFilmId(Long filmId, Long count) {
-        if (count == null) {
-            count = 10L;
-        }
         Collection<Review> allReview = new ArrayList<>();
-        SqlRowSet allReviewRows = jdbcTemplate.queryForRowSet("select * " +
-                "from reviews" +
-                " where film_id = ? LIMIT ?", filmId, count);
+        SqlRowSet allReviewRows;
+        if (filmId == null) {
+            allReviewRows = jdbcTemplate.queryForRowSet("select * " +
+                    "from reviews" +
+                    " LIMIT ?", count);
+        } else {
+
+            allReviewRows = jdbcTemplate.queryForRowSet("select * " +
+                    "from reviews" +
+                    " where film_id = ? LIMIT ?", filmId, count);
+        }
         while (allReviewRows.next()) {
             allReview.add(new Review(
                     allReviewRows.getLong("review_id"),

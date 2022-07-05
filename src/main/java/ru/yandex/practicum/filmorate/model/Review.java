@@ -17,7 +17,7 @@ public class Review {
     //содержание отзыва
     private String content;
     //рейтинг полезности
-    private int useful;
+    private long useful;
     @NotNull
     //тип отзыва
     private Boolean isPositive;
