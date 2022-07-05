@@ -15,21 +15,23 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    private FilmGenreService filmGenreService;
-    private FilmStorage filmStorage;
-    private RateUserService rateUserService;
-    private UserService userService;
+    final private FilmGenreService filmGenreService;
+    final private FilmStorage filmStorage;
+    final private RateUserService rateUserService;
+    final private UserService userService;
+    final private EventService eventService;
 
     @Autowired
-    public FilmService(
-            FilmGenreService filmGenreService
-            , FilmStorage filmStorage
-            , RateUserService rateUserService
-            , UserService userService) {
+    public FilmService(FilmGenreService filmGenreService,
+                       FilmStorage filmStorage,
+                       RateUserService rateUserService,
+                       UserService userService,
+                       EventService eventService) {
         this.filmGenreService = filmGenreService;
         this.filmStorage = filmStorage;
         this.rateUserService = rateUserService;
         this.userService = userService;
+        this.eventService = eventService;
     }
 
     public Film getFilm(long filmId) {
@@ -79,6 +81,10 @@ public class FilmService {
         User user = userService.getUser(userId);
         rateUserService.addRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
+
+        Long rateId = eventService.getRateEntityId(userId, filmId);
+        eventService.createEvent(userId, "LIKE", "ADD", rateId);
+
         return getFilm(filmId);
     }
 
@@ -87,6 +93,10 @@ public class FilmService {
         Film film = getFilm(filmId);
         if (!rateUserService.getRateUsers(filmId).contains(userId))
             throw new NotFoundException("пользователь не ставил лайков");
+
+        Long rateId = eventService.getRateEntityId(userId, filmId);
+        eventService.createEvent(userId, "LIKE", "REMOTE", rateId);
+
         rateUserService.removeRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
         return getFilm(filmId);

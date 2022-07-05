@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.storage.EventStorage;
@@ -14,7 +15,7 @@ public class EventService {
     UserService userService;
 
     @Autowired
-    public EventService(EventStorage eventStorage, UserService userService) {
+    public EventService(EventStorage eventStorage, @Lazy UserService userService) {
         this.eventStorage = eventStorage;
         this.userService = userService;
     }
@@ -29,5 +30,13 @@ public class EventService {
         userService.getUser(userId);
 
         return eventStorage.getUserEvents(userId);
+    }
+
+    public Long getFriendshipEntityId(Long userId, Long friendId) {
+        return eventStorage.getFriendshipEntityId(userId, friendId);
+    }
+
+    public Long getRateEntityId(Long userId, Long filmId) {
+        return eventStorage.getRateEntityId(userId, filmId);
     }
 }

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,11 +15,13 @@ import java.util.Set;
 
 @Service
 public class UserService {
-    private UserStorage userStorage;
+    final private UserStorage userStorage;
+    final private EventService eventService;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(UserStorage userStorage, @Lazy EventService eventService) {
         this.userStorage = userStorage;
+        this.eventService = eventService;
     }
 
     public User getUser(long userId) {
@@ -53,6 +56,10 @@ public class UserService {
         User user = getUser(userId);
         user.addFriend(friendId);
         userStorage.updateUser(user);
+
+        Long friendshipId = eventService.getFriendshipEntityId(userId, friendId);
+        eventService.createEvent(userId, "FRIEND", "ADD", friendshipId);
+
         return user;
     }
 
@@ -62,8 +69,11 @@ public class UserService {
         if (!user.getFriends().contains(friendId))
             throw new NotFoundException("список друзей отсутствует");
         user.removeFriend(friendId);
-        userStorage.updateUser(user);
 
+        Long friendshipId = eventService.getFriendshipEntityId(userId, friendId);
+        eventService.createEvent(userId, "FRIEND", "REMOVE", friendshipId);
+
+        userStorage.updateUser(user);
         return user;
     }
 
