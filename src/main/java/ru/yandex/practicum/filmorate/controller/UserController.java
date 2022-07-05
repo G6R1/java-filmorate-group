@@ -36,9 +36,15 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         log.debug("Обновлён пользователь: {}", user);
         return userService.updateUser(user);
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void delete(@PathVariable Long id) {
+        userService.removeUser(id);
     }
 
     @PutMapping(value = "/{id}/friends/{friendId}")
@@ -64,11 +70,5 @@ public class UserController {
     @DeleteMapping(value = "/{id}/friends/{friendId}")
     public User removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
         return userService.removeFriend(id, friendId);
-    }
-
-    @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeUser(@PathVariable Long id) {
-        userService.removeUser(id);
     }
 }

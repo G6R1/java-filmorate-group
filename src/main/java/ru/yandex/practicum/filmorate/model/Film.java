@@ -25,6 +25,7 @@ public class Film {
     private RateMpa mpa;
     private Set<Genre> genres;
     private int rateUsers;
+    private Set<Director> directors;
 
     public static final Comparator<Film>
             COMPARE_BY_RATE = (film1, film2) -> film2.getRateUsers() -

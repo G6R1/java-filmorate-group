@@ -8,23 +8,30 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmDirectorService;
+import ru.yandex.practicum.filmorate.service.FilmGenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class FilmDbStorage implements FilmStorage {
+    private FilmDirectorService filmDirectorService;
+    private FilmGenreService filmGenreService;
     private MpaService mpaService;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public FilmDbStorage(MpaService mpaService, JdbcTemplate jdbcTemplate) {
+    public FilmDbStorage(FilmDirectorService filmDirectorService
+            , FilmGenreService filmGenreService
+            , MpaService mpaService
+            , JdbcTemplate jdbcTemplate) {
+        this.filmDirectorService = filmDirectorService;
+        this.filmGenreService = filmGenreService;
         this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -92,6 +99,69 @@ public class FilmDbStorage implements FilmStorage {
         film.setReleaseDate(resultSet.getString("film_release_date"));
         film.setDuration(resultSet.getInt("film_duration"));
         film.setMpa(mpaService.getMpa(resultSet.getInt("mpa_id")));
+        film.setDirectors(filmDirectorService.getFilmDirectors(resultSet.getLong("film_id")));
         return film;
+    }
+
+    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
+        List<Film> sortFilm = new ArrayList<>();
+        if (sort.iterator().next().equals("year")) {
+            String sqlQuery = "SELECT f.*, d.* FROM films f JOIN film_director fd " +
+                    "ON f.film_id = fd.film_id  JOIN directors d ON d.director_id = fd.director_id" +
+                    " WHERE fd.director_id = ? ORDER BY FILM_RELEASE_DATE ASC;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
+        }
+        if (sort.iterator().next().equals("likes")) {
+            String sqlQuery = "SELECT f.*, d.*, count(USER_ID) as count " +
+                    "FROM films f JOIN film_director fd ON f.film_id = fd.film_id" +
+                    " JOIN directors d ON d.director_id = fd.director_id" +
+                    " LEFT JOIN rate_users ru ON f.FILM_ID = ru.film_id WHERE fd.director_id = ?" +
+                    " GROUP BY F.FILM_ID ORDER BY ru.USER_ID ASC;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
+        }
+        sortFilm.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+        });
+        return sortFilm;
+    }
+
+    public Collection<Film> getFilmsSearch(String query, String sortBy) {
+        List<Film> sortFilm = new ArrayList<>();
+        if (sortBy.equals("title,director")) {
+            String sqlQuery = "select* " +
+                    "FROM films f LEFT JOIN film_director fd ON f.film_id = fd.film_id" +
+                    " LEFT JOIN directors d ON d.director_id = fd.director_id" +
+                    " LEFT JOIN rate_users ru ON f.film_id = ru.film_id" +
+                    " where lower(d.director_name) like lower('%" + query + "%') or" +
+                    " lower(f.film_name) like lower('%" + query + "%') " +
+                    " GROUP BY f.film_id ORDER BY count(ru.user_id) desc;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm);
+        }
+        if (sortBy.equals("title")) {
+            String sqlQuery = "select* " +
+                    "FROM films f LEFT JOIN rate_users ru ON f.film_id = ru.film_id" +
+                    " where lower(f.film_name) like lower('%" + query + "%')" +
+                    " GROUP BY f.film_id ORDER BY count(ru.user_id) desc;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm);
+        }
+        if (sortBy.equals("director")) {
+            String sqlQuery = "select* " +
+                    "FROM films f LEFT JOIN film_director fd ON f.film_id = fd.film_id" +
+                    " LEFT JOIN directors d ON d.director_id = fd.director_id" +
+                    " LEFT JOIN rate_users ru ON f.film_id = ru.film_id" +
+                    " where lower(d.director_name) like lower('%" + query + "%')" +
+                    " GROUP BY f.film_id ORDER BY count(ru.user_id) desc;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm);
+        }
+        sortFilm.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+        });
+        return sortFilm;
     }
 }

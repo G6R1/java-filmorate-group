@@ -1,3 +1,5 @@
+drop table if exists genres,rate_mpa,films,film_genres,FILM_DIRECTOR,DIRECTORS,user_user,rate_users,user_friends;
+
 CREATE TABLE IF NOT EXISTS genres (
   genre_id INTEGER PRIMARY KEY,
   genre_name VARCHAR(50)
@@ -21,8 +23,18 @@ CREATE TABLE IF NOT EXISTS films (
 
  CREATE TABLE IF NOT EXISTS film_genres (
   film_id BIGINT REFERENCES films (film_id),
-  genre_id INTEGER REFERENCES genres (genre_id)
+  genre_id INTEGER REFERENCES genres (genre_id) ON DELETE CASCADE
  );
+
+ CREATE TABLE IF NOT EXISTS directors (
+  director_id int PRIMARY KEY AUTO_INCREMENT,
+  director_name VARCHAR(50)
+  );
+
+ CREATE TABLE IF NOT EXISTS film_director (
+  director_id int references directors (director_id) ON DELETE CASCADE,
+  film_id BIGINT references films (film_id) ON DELETE CASCADE
+  );
 
 CREATE TABLE IF NOT EXISTS user_user (
  user_name VARCHAR(50),
@@ -33,8 +45,8 @@ CREATE TABLE IF NOT EXISTS user_user (
  );
 
 CREATE TABLE IF NOT EXISTS rate_users (
- film_id BIGINT REFERENCES films (film_id),
- user_id BIGINT REFERENCES user_user(user_id)
+ film_id BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
+ user_id BIGINT REFERENCES user_user(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS user_friends (
