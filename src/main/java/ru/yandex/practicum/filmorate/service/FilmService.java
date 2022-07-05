@@ -32,6 +32,10 @@ public class FilmService {
         this.userService = userService;
     }
 
+    public List<Film>  getCommon(int userId,int friendId){
+        return filmStorage.getCommon(userId, friendId);
+    }
+
     public Film getFilm(long filmId) {
         Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
         if (!filmGenreService.getFilmGenres(film.getId()).isEmpty()) {
