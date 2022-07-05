@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS films, user_user, user_friends, rate_users, rate_mpa, genres, film_genres;
+drop table if exists genres, rate_mpa, films, film_genres, DIRECTORS, FILM_DIRECTOR, user_user, rate_users, user_friends;
 
 CREATE TABLE IF NOT EXISTS genres (
   genre_id INTEGER PRIMARY KEY,
@@ -30,6 +30,23 @@ CREATE TABLE IF NOT EXISTS films (
   constraint FILM_GENRES_GENRES_GENRE_ID_FK
       foreign key (GENRE_ID) references GENRES (GENRE_ID) ON DELETE CASCADE
  );
+
+create table IF NOT EXISTS DIRECTORS
+(
+    DIRECTOR_ID   INT auto_increment,
+    NAME_DIRECTOR CHARACTER VARYING(100),
+    constraint DIRECTOR_FILM_PK
+        primary key (DIRECTOR_ID)
+);
+
+create table IF NOT EXISTS FILM_DIRECTOR
+(
+    FILM_ID     BIGINT not null,
+    DIRECTOR_ID INT    not null,
+    CONSTRAINT pkFilmDirector PRIMARY KEY (FILM_ID, DIRECTOR_ID),
+        foreign key (DIRECTOR_ID) references DIRECTORS (DIRECTOR_ID),
+        foreign key (FILM_ID) references FILMS (FILM_ID)
+);
 
 CREATE TABLE IF NOT EXISTS user_user (
  user_name VARCHAR(50),
