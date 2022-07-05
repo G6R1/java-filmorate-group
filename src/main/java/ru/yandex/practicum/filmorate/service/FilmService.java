@@ -140,6 +140,9 @@ public class FilmService {
     }
 
     public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
+        if (directorId <= 0 & sort.isEmpty()) {
+            throw new NotFoundException("Неверные входные данные");
+        }
        return filmStorage.getFilmsByDirector(directorId, sort);
     }
 }

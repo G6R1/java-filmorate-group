@@ -1,4 +1,4 @@
-drop table if exists genres, rate_mpa, films, film_genres, FILM_DIRECTOR, DIRECTORS, user_user, rate_users, user_friends;
+drop table if exists genres, rate_mpa, films, film_genres, DIRECTORS, FILM_DIRECTOR, user_user, rate_users, user_friends;
 
 CREATE TABLE IF NOT EXISTS genres (
   genre_id INTEGER PRIMARY KEY,
@@ -43,9 +43,8 @@ create table IF NOT EXISTS FILM_DIRECTOR
 (
     FILM_ID     BIGINT not null,
     DIRECTOR_ID INT    not null,
-    constraint DIRECTOR_DIRECTOR___FK
+    CONSTRAINT pkFilmDirector PRIMARY KEY (FILM_ID, DIRECTOR_ID),
         foreign key (DIRECTOR_ID) references DIRECTORS (DIRECTOR_ID),
-    constraint FILM_DIRECTOR_FK
         foreign key (FILM_ID) references FILMS (FILM_ID)
 );
 
