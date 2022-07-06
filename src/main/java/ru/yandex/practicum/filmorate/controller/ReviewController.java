@@ -30,8 +30,8 @@ public class ReviewController {
     }
 
     @PostMapping
-    public Review createReview(@Valid @RequestBody Review review) {
-        return reviewService.createReview(review);
+    public Review addReview(@Valid @RequestBody Review review) {
+        return reviewService.addReview(review);
     }
 
     @PutMapping

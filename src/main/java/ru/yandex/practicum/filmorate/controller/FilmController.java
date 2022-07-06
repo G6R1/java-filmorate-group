@@ -25,8 +25,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/common")
-    public List<Film> getCommonFilms(@RequestParam int userId,
-                                     @RequestParam int friendId) {
+    public List<Film> getCommonFilms(@RequestParam Long userId,
+                                     @RequestParam Long friendId) {
         return filmService.getCommon(userId, friendId);
     }
 
@@ -56,11 +56,7 @@ public class FilmController {
 
     @DeleteMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
-<<<<<<< HEAD
-    public void delete(@PathVariable Long id) {
-=======
     public void removeFilm(@PathVariable Long id) {
->>>>>>> add-common-films
         filmService.removeFilm(id);
     }
 

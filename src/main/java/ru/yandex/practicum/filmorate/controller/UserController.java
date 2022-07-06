@@ -41,12 +41,6 @@ public class UserController {
         return userService.updateUser(user);
     }
 
-    @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable Long id) {
-        userService.removeUser(id);
-    }
-
     @PutMapping(value = "/{id}/friends/{friendId}")
     public User addFriend(@PathVariable long id, @PathVariable long friendId) {
         return userService.addFriend(id, friendId);
@@ -71,13 +65,10 @@ public class UserController {
     public User removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
         return userService.removeFriend(id, friendId);
     }
-<<<<<<< HEAD
-=======
 
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void removeUser(@PathVariable Long id) {
         userService.removeUser(id);
     }
->>>>>>> add-common-films
 }

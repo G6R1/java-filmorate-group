@@ -11,8 +11,4 @@ public class FilmDirector {
         this.filmId = filmId;
         this.directorId = directorId;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> add-common-films

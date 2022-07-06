@@ -20,8 +20,7 @@ public class ReviewService {
         this.userService = userService;
     }
 
-
-    public Review createReview(Review review) {
+    public Review addReview(Review review) {
         validate(review);
         reviewStorage.createReview(review);
         return review;

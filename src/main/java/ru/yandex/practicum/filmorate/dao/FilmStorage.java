@@ -3,16 +3,13 @@ package ru.yandex.practicum.filmorate.dao;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
-<<<<<<< HEAD
-=======
 import java.util.List;
->>>>>>> add-common-films
 import java.util.Map;
 import java.util.Optional;
 
 public interface FilmStorage {
 
-    List<Film> getCommon(int userId, int friendId);
+    List<Film> getCommon(long userId, long friendId);
 
     //создаёт фильм
     void createFilm(Film film);
@@ -31,9 +28,5 @@ public interface FilmStorage {
 
     Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> add-common-films
     Collection<Film> getFilmsSearch(String query, String sortBy);
 }

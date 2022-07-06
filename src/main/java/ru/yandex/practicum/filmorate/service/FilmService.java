@@ -36,20 +36,24 @@ public class FilmService {
         this.userService = userService;
     }
 
-    public List<Film>  getCommon(int userId,int friendId){
-        return filmStorage.getCommon(userId, friendId);
+    public List<Film> getCommon(long userId, long friendId) {
+        List<Film> common = filmStorage.getCommon(userId, friendId);
+        common.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return common;
     }
 
     public Film getFilm(long filmId) {
-        Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
+        Film film = filmStorage.getFilm(filmId).orElseThrow(()
+                -> new NotFoundException("такого фильма нет в списке"));
         if (!filmGenreService.getFilmGenres(filmId).isEmpty()) {
             film.setGenres(filmGenreService.getFilmGenres(filmId));
         }
         if (!rateUserService.getRateUsers(filmId).isEmpty()) {
             film.setRateUsers(rateUserService.getRateUsers(filmId).size());
         }
-        if (!filmDirectorService.getFilmDirectors(filmId).isEmpty())
-            film.setDirectors(filmDirectorService.getFilmDirectors(filmId));
         return film;
     }
 
@@ -109,11 +113,6 @@ public class FilmService {
         filmSearchByDirector.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-<<<<<<< HEAD
-            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
-                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
-=======
->>>>>>> add-common-films
         });
         return filmSearchByDirector;
     }
@@ -123,11 +122,6 @@ public class FilmService {
         filmSearch.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-<<<<<<< HEAD
-            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
-                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
-=======
->>>>>>> add-common-films
         });
         return filmSearch;
     }

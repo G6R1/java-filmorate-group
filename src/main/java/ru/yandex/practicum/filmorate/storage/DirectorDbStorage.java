@@ -65,8 +65,4 @@ public class DirectorDbStorage implements DirectorStorage {
         director.setName(resultSet.getString("director_name"));
         return director;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> add-common-films
