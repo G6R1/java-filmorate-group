@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.Set;
 
 @Data
-
 public class Film {
     @NotBlank(message = "incorrect name")
     private String name;
@@ -23,10 +22,12 @@ public class Film {
     private int duration;
     @NotNull
     private RateMpa mpa;
+    private Set<Director> directors;
     private Set<Genre> genres;
     private int rateUsers;
 
     public static final Comparator<Film>
             COMPARE_BY_RATE = (film1, film2) -> film2.getRateUsers() -
             film1.getRateUsers();
+
 }

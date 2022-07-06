@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         log.debug("Обновлён пользователь: {}", user);
         return userService.updateUser(user);
     }
@@ -67,7 +67,7 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseStatus(HttpStatus.OK)
     public void removeUser(@PathVariable Long id) {
         userService.removeUser(id);
     }

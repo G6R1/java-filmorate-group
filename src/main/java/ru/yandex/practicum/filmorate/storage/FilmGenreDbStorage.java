@@ -23,9 +23,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
 
     public List<FilmGenre> getFilmGenres(long filmId) {
         String sql = "select * from film_genres where film_id = ?";
-
         return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilmGenre(rs), filmId);
-
     }
 
     public void addFilmGenre(long filmId, int genreId) {
