@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,7 @@ public class FilmService {
     public Film createFilm(Film film) {
         validate(film);
         filmStorage.createFilm(film);
+        filmVariablesCheck(film);
         if (film.getGenres() != null) {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
@@ -69,6 +71,7 @@ public class FilmService {
         getFilm(film.getId());
         filmGenreService.removeFilmGenre(film.getId());
         filmDirectorService.removeFilmDirectors(film.getId());
+        filmVariablesCheck(film);
         if (film.getGenres() != null) {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
@@ -141,13 +144,15 @@ public class FilmService {
 
     private void validate(Film film) {
         if (LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28))) {
-            filmStorage.removeFilm(film.getId());
-            throw new ValidationException("неправильный фильм");
+            throw new ValidationException("Некорректная дата релиза фильма");
         }
-        if (film.getGenres() != null) {
+    }
+
+    private void filmVariablesCheck (Film film) {
+        /*if (film.getGenres() != null) {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-        }
+        }*/
         if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
             film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));

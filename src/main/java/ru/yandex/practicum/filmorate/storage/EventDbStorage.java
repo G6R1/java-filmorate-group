@@ -49,7 +49,7 @@ public class EventDbStorage implements EventStorage {
         values.put("user_id", event.getUserId());
         values.put("event_type", event.getEventType());
         values.put("operation", event.getOperation());
-        values.put("event_time", event.getEventType());
+        values.put("event_time", event.getTimestamp());
         values.put("entity_id", event.getEntityId());
         return values;
     }

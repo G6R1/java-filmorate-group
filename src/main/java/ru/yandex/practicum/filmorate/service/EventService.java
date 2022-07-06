@@ -22,7 +22,7 @@ public class EventService {
 
     public void createEvent(Long userId, String eventType, String operation, Long entityId) {
         Long timestamp = Instant.now().toEpochMilli();
-        eventStorage.createEvent(new Event(userId, eventType, operation,timestamp,entityId));
+        eventStorage.createEvent(new Event(userId, eventType, operation,timestamp, entityId));
     }
 
     public List<Event> getUserEvents(Long userId) {
