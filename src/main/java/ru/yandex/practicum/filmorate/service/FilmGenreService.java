@@ -22,7 +22,7 @@ public class FilmGenreService {
         this.genreService = genreService;
     }
 
-    public Set<Genre> getFilmGenres(long filmId) {
+    Set<Genre> getFilmGenres(long filmId) {
         return filmGenreStorage.getFilmGenres(filmId)
                 .stream()
                 .map(FilmGenre::getGenreId)
