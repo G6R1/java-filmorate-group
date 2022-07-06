@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.FilmDirectorStorage;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -18,31 +16,24 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
+    private FilmDirectorService filmDirectorService;
     private FilmGenreService filmGenreService;
     private FilmStorage filmStorage;
     private RateUserService rateUserService;
     private UserService userService;
-    private FilmDirectorService filmDirectorService;
-
-    private FilmDirectorStorage filmDirectorStorage;
-
-    JdbcTemplate jdbcTemplate;
 
     @Autowired
     public FilmService(
-            FilmGenreService filmGenreService
+            FilmDirectorService filmDirectorService
+            , FilmGenreService filmGenreService
             , FilmStorage filmStorage
             , RateUserService rateUserService
-            , UserService userService, JdbcTemplate jdbcTemplate
-            , FilmDirectorService filmDirectorService, FilmDirectorStorage filmDirectorStorage) {
+            , UserService userService) {
+        this.filmDirectorService = filmDirectorService;
         this.filmGenreService = filmGenreService;
         this.filmStorage = filmStorage;
         this.rateUserService = rateUserService;
         this.userService = userService;
-        this.jdbcTemplate = jdbcTemplate;
-        this.filmDirectorService = filmDirectorService;
-        this.filmDirectorStorage = filmDirectorStorage;
-
     }
 
     public List<Film>  getCommon(int userId,int friendId){
@@ -51,55 +42,29 @@ public class FilmService {
 
     public Film getFilm(long filmId) {
         Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
-        if (!filmGenreService.getFilmGenres(film.getId()).isEmpty()) {
-            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-        } else {
-            film.setGenres(null);
+        if (!filmGenreService.getFilmGenres(filmId).isEmpty()) {
+            film.setGenres(filmGenreService.getFilmGenres(filmId));
         }
-        if (!rateUserService.getRateUsers(film.getId()).isEmpty()) {
-            film.setRateUsers(rateUserService.getRateUsers(film.getId()).size());
+        if (!rateUserService.getRateUsers(filmId).isEmpty()) {
+            film.setRateUsers(rateUserService.getRateUsers(filmId).size());
         }
-        if (!filmDirectorService.getFilmDirector(film.getId()).isEmpty()) {
-            film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
-        }
+        if (!filmDirectorService.getFilmDirectors(filmId).isEmpty())
+            film.setDirectors(filmDirectorService.getFilmDirectors(filmId));
         return film;
     }
 
     public Film createFilm(Film film) {
-        validate(film);
         filmStorage.createFilm(film);
-        if (film.getGenres() != null) {
-            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-        }
-        if (film.getDirectors() != null) {
-            filmDirectorService.addFilmDirector(film.getId(), film.getDirectors());
-            film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
-        }
+        validate(film);
         return film;
     }
 
     public Film updateFilm(Film film) {
-        validate(film);
         getFilm(film.getId());
-        filmStorage.updateFilm(film);
         filmGenreService.removeFilmGenre(film.getId());
-        if (film.getGenres() != null) {
-            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-        }
-        if (film.getDirectors() != null) {
-            filmDirectorService.addFilmDirector(film.getId(), film.getDirectors());
-            film.setDirectors(filmDirectorService.getFilmDirector(film.getId()));
-        } else {
-            filmDirectorService.removeFilmDirector(film.getId());
-        }
-        if (film.getRateUsers() != 0) {
-            rateUserService.addRateUser(film.getId(), film.getRateUsers());
-            film.setRateUsers(film.getRateUsers());
-        } else {
-            film.setRateUsers(0);
-        }
+        filmDirectorService.removeFilmDirectors(film.getId());
+        validate(film);
+        filmStorage.updateFilm(film);
         return film;
     }
 
@@ -138,15 +103,41 @@ public class FilmService {
         return popular.stream().limit(count).collect(Collectors.toList());
     }
 
-    private void validate(Film film) {
-        if (LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28)))
-            throw new ValidationException("неправильный фильм");
+    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy) {
+        filmDirectorService.getDirector(directorId);
+        Collection<Film> filmSearchByDirector = filmStorage.getFilmsByDirector(directorId, sortBy);
+        filmSearchByDirector.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return filmSearchByDirector;
     }
 
-    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
-        if (directorId <= 0 & sort.isEmpty()) {
-            throw new NotFoundException("Неверные входные данные");
+    public Collection<Film> getFilmSearch(String query, String sortBy) {
+        Collection<Film> filmSearch = filmStorage.getFilmsSearch(query, sortBy);
+        filmSearch.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return filmSearch;
+    }
+
+    private void validate(Film film) {
+        if (LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28))) {
+            filmStorage.removeFilm(film.getId());
+            throw new ValidationException("неправильный фильм");
         }
-       return filmStorage.getFilmsByDirector(directorId, sort);
+        if (film.getGenres() != null) {
+            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
+        if (film.getDirectors() != null) {
+            filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
+            film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+        }
+        if (film.getRateUsers() != 0) {
+            rateUserService.addRateUser(film.getId(), film.getRateUsers());
+            film.setRateUsers(film.getRateUsers());
+        }
     }
 }
