@@ -58,6 +58,6 @@ CREATE TABLE IF NOT EXISTS review_rating (
     review_id BIGINT REFERENCES reviews (review_id) ON DELETE CASCADE,
     user_id BIGINT REFERENCES user_user (user_id) ON DELETE CASCADE,
     useful BIGINT NOT NULL,
-    --СЃРѕСЃС‚Р°РІРЅРѕР№ РїРµСЂРІРёС‡РЅС‹Р№ РєР»СЋС‡, С‡С‚РѕР±С‹ СѓРЅРёРєР°Р»СЊРЅРѕ РёРґРµРЅС‚РёС„РёС†РёСЂРѕРІР°С‚СЊ useful
+    --составной первичный ключ, чтобы уникально идентифицировать useful
     CONSTRAINT pk_review_useful PRIMARY KEY (review_id, user_id)
 );
