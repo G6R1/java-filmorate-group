@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -16,6 +15,7 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -55,7 +55,7 @@ public class ReviewDBStorage implements ReviewStorage {
                 review.getIsPositive(),
                 review.getId());
 
-        log.info("Изменён отзыв: {}", review);
+        log.info("Изменён отзыв: {}", getReviewById(review.getId()));
         return review;
     }
 
@@ -66,7 +66,7 @@ public class ReviewDBStorage implements ReviewStorage {
     }
 
     @Override
-    public Review getReviewById(Long id) {
+    public Optional<Review> getReviewById(Long id) {
         SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from reviews where review_id = ?", id);
         if (reviewRows.next()) {
             Review review = new Review(
@@ -75,10 +75,10 @@ public class ReviewDBStorage implements ReviewStorage {
                     reviewRows.getLong("film_id"),
                     reviewRows.getString("content"),
                     reviewRows.getBoolean("is_positive"));
-            log.info("Получен отзыв #" + id);
-            return review;
+            log.info("Получен отзыв: {}", id);
+            return Optional.of(review);
         } else {
-            log.error("Отзыв #" + id + " не найден!");
+            log.error("Не найден отзыв: {}", id);
             throw new NotFoundException("Отзыв #" + id + " не найден!");
         }
     }
@@ -88,52 +88,50 @@ public class ReviewDBStorage implements ReviewStorage {
         Collection<Review> allReview = new ArrayList<>();
         SqlRowSet allReviewRows;
         if (filmId == null) {
-            allReviewRows = jdbcTemplate.queryForRowSet("select * " +
-                    "from reviews" +
-                    " LIMIT ?", count);
+            allReviewRows = jdbcTemplate.queryForRowSet("select r.review_id as rrev_id, r.user_id as rus_id, " +
+                    "film_id, content, is_positive, " +
+                    "(CASE WHEN sum(rr.useful) IS NULL THEN 0 ELSE sum(rr.useful) END) as sum " +
+                    "from reviews as r " +
+                    "left join review_rating as rr on rr.review_id = r.review_id " +
+                    "group by r.review_id " +
+                    "order by sum desc " +
+                    "LIMIT ?", count);
         } else {
-
-            allReviewRows = jdbcTemplate.queryForRowSet("select * " +
-                    "from reviews" +
-                    " where film_id = ? LIMIT ?", filmId, count);
+            allReviewRows = jdbcTemplate.queryForRowSet("select r.review_id as rrev_id, r.user_id as rus_id, " +
+                    "film_id, content, is_positive, " +
+                    "(CASE WHEN sum(rr.useful) IS NULL THEN 0 ELSE sum(rr.useful) END) as sum " +
+                    "from reviews as r " +
+                    "left join review_rating as rr on rr.review_id = r.review_id " +
+                    "where film_id = ? " +
+                    "group by r.review_id " +
+                    "order by sum desc " +
+                    "LIMIT ?", filmId, count);
         }
         while (allReviewRows.next()) {
             allReview.add(new Review(
-                    allReviewRows.getLong("review_id"),
-                    allReviewRows.getLong("user_id"),
+                    allReviewRows.getLong("RREV_ID"),
+                    allReviewRows.getLong("RUS_ID"),
                     allReviewRows.getLong("film_id"),
                     allReviewRows.getString("content"),
+                    allReviewRows.getLong("SUM"),
                     allReviewRows.getBoolean("is_positive")));
         }
         return allReview;
     }
 
     @Override
-    public Review addReviewUseful(Long reviewId, Long userId, Long value) {
-        try {
-            jdbcTemplate.update("insert into review_rating (review_id, user_id, useful) " +
-                    "VALUES (?, ?, ?);", reviewId, userId, value);
-        } catch (DataIntegrityViolationException e) {
-            String message = e.getMessage();
-
-            if (message.contains("PRIMARY_KEY")) {
-                throw new NotFoundException("Пользователь " + userId +
-                        " или отзыв " + reviewId + " не найден!");
-            }
-        }
+    public Optional<Review> addReviewUseful(Long reviewId, Long userId, Long value) {
+        jdbcTemplate.update("insert into review_rating (review_id, user_id, useful) " +
+                "VALUES (?, ?, ?);", reviewId, userId, value);
         return getReviewById(reviewId);
     }
 
     @Override
-    public Review removeReviewUseful(Long reviewId, Long userId, Long value) {
-        int deleteResult = jdbcTemplate.update("delete from" +
+    public Optional<Review> removeReviewUseful(Long reviewId, Long userId, Long value) {
+        jdbcTemplate.update("delete from" +
                 " review_rating" +
                 " where review_id = ? " +
                 "and user_id = ? and useful = ?", reviewId, userId, value);
-
-        if (deleteResult == 0) {
-            throw new NotFoundException("Реакций не найдено!");
-        }
         return getReviewById(reviewId);
     }
 }

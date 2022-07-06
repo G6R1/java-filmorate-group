@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -29,4 +30,15 @@ public class Review {
         this.content = content;
         this.isPositive = isPositive;
     }
+
+    @JsonCreator
+    public Review(long id, Long userId, Long filmId, String content, long useful, Boolean isPositive) {
+        this.id = id;
+        this.userId = userId;
+        this.filmId = filmId;
+        this.content = content;
+        this.useful = useful;
+        this.isPositive = isPositive;
+    }
+
 }

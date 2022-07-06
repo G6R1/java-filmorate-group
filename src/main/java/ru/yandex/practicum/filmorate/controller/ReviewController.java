@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping("/{id}")
-    public Review findById(@PathVariable Long id) {
+    public Optional<Review> findById(@PathVariable Long id) {
         return reviewService.getReviewById(id);
     }
 
@@ -46,7 +47,7 @@ public class ReviewController {
 
 
     @PutMapping("/{id}/like/{userId}")
-    public Review putLikeReview(
+    public Optional<Review> putLikeReview(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
@@ -54,7 +55,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public Review putDislikeReview(
+    public Optional<Review> putDislikeReview(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
@@ -62,7 +63,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Review deleteLikeReview(
+    public Optional<Review> deleteLikeReview(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {
@@ -70,7 +71,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
-    public Review deleteDislikeReview(
+    public Optional<Review> deleteDislikeReview(
             @PathVariable Long id,
             @PathVariable Long userId
     ) {

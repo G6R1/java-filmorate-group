@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class ReviewService {
         reviewStorage.remove(id);
     }
 
-    public Review getReviewById(Long id) {
+    public Optional<Review> getReviewById(Long id) {
         return reviewStorage.getReviewById(id);
     }
 
@@ -42,19 +43,19 @@ public class ReviewService {
         return reviewStorage.getAllReviewsByFilmId(id, count);
     }
 
-    public Review addLikeReview(Long reviewId, Long userId) {
+    public Optional<Review> addLikeReview(Long reviewId, Long userId) {
         return reviewStorage.addReviewUseful(reviewId, userId, USEFUL_CHANGE_STEP);
     }
 
-    public Review addDislikeReview(Long reviewId, Long userId) {
+    public Optional<Review> addDislikeReview(Long reviewId, Long userId) {
         return reviewStorage.addReviewUseful(reviewId, userId, -USEFUL_CHANGE_STEP);
     }
 
-    public Review removeLikeReview(Long reviewId, Long userId) {
+    public Optional<Review> removeLikeReview(Long reviewId, Long userId) {
         return reviewStorage.removeReviewUseful(reviewId, userId, USEFUL_CHANGE_STEP);
     }
 
-    public Review removeDislikeReview(Long reviewId, Long userId) {
+    public Optional<Review> removeDislikeReview(Long reviewId, Long userId) {
         return reviewStorage.removeReviewUseful(reviewId, userId, -USEFUL_CHANGE_STEP);
     }
 
