@@ -73,12 +73,3 @@ CREATE TABLE IF NOT EXISTS user_friends (
       foreign key (USER_ID) references user_user ON DELETE CASCADE,
   foreign key (FRIEND_ID) references user_user ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS reviews (
- review_id BIGINT PRIMARY KEY AUTO_INCREMENT,
- content varchar NOT NULL,
- is_positive BOOlEAN NOT NULL,
- user_id BIGINT REFERENCES user_user (user_id) ON DELETE CASCADE,
- film_id BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
- useful INTEGER DEFAULT 0
-);
