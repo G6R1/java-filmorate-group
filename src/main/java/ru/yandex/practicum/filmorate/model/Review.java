@@ -5,28 +5,24 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Comparator;
 
 @Data
 public class Review {
     private long id;
+    @NotBlank
+    //содержание отзыва
+    private String content;
+    @NotNull
+    //тип отзыва
+    private Boolean isPositive;
     @NotNull
     private Long userId;
     @NotNull
     private Long filmId;
-    @NotBlank
-    //содержание отзыва
-    private String content;
     //рейтинг полезности
     private int useful;
-    @NotNull
-    //тип отзыва
-    private Boolean isPositive;
 
-    public Review(long id, long userId, long filmId, String content, Boolean isPositive) {
-        this.id = id;
-        this.userId = userId;
-        this.filmId = filmId;
-        this.content = content;
-        this.isPositive = isPositive;
-    }
+    public static final Comparator<Review>
+            COMPARE_BY_USEFUL = (review1, review2) -> review2.getUseful() - review1.getUseful();
 }

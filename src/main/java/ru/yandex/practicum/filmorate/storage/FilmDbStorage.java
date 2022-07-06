@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmDirectorService;
-import ru.yandex.practicum.filmorate.service.FilmGenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.sql.PreparedStatement;
@@ -21,17 +20,14 @@ import java.util.stream.Collectors;
 @Component
 public class FilmDbStorage implements FilmStorage {
     private FilmDirectorService filmDirectorService;
-    private FilmGenreService filmGenreService;
     private MpaService mpaService;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public FilmDbStorage(FilmDirectorService filmDirectorService
-            , FilmGenreService filmGenreService
             , MpaService mpaService
             , JdbcTemplate jdbcTemplate) {
         this.filmDirectorService = filmDirectorService;
-        this.filmGenreService = filmGenreService;
         this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -119,12 +115,6 @@ public class FilmDbStorage implements FilmStorage {
                     " GROUP BY F.FILM_ID ORDER BY ru.USER_ID ASC;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
         }
-        sortFilm.forEach(film -> {
-            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
-                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
-                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
-        });
         return sortFilm;
     }
 
@@ -156,12 +146,6 @@ public class FilmDbStorage implements FilmStorage {
                     " GROUP BY f.film_id ORDER BY count(ru.user_id) desc;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm);
         }
-        sortFilm.forEach(film -> {
-            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
-                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
-                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
-        });
         return sortFilm;
     }
 }

@@ -2,28 +2,23 @@ package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Review;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public interface ReviewStorage {
 
     //Добавление нового отзыва
-    Review add(Review review);
+    void createReview(Review review);
 
-    Review update(Review review);
+    void updateReview(Review review);
 
-    void remove(Long id);
+    void removeReview(Long id);
 
-    Review getReviewById(Long id);
+    void setUseful(int useful, Long id);
 
-    Collection<Review> getAllReviewsByFilmId(Long filmId, Long count);
+    Optional<Review> getReviewById(Long id);
 
-    //Добавить лайк/дизлайк к отзыву
-    Review addReviewUseful(Long reviewId, Long userId, Long value);
+    List<Review> getAllReviewsByFilmId(Long filmId, Long count);
 
-    //Значение value:
-    // 1 - лайк
-    // -1 - дизлайк
-
-    //Удалить лайк/дизлайк к отзыву
-    Review removeReviewUseful(Long reviewId, Long userId, Long value);
+    List<Review> getAllReviews(Long count);
 }

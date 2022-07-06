@@ -101,11 +101,25 @@ public class FilmService {
 
     public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy) {
         filmDirectorService.getDirector(directorId);
-        return filmStorage.getFilmsByDirector(directorId, sortBy);
+        Collection<Film> filmSearchByDirector = filmStorage.getFilmsByDirector(directorId, sortBy);
+        filmSearchByDirector.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+        });
+        return filmSearchByDirector;
     }
 
     public Collection<Film> getFilmSearch(String query, String sortBy) {
-        return filmStorage.getFilmsSearch(query, sortBy);
+        Collection<Film> filmSearch = filmStorage.getFilmsSearch(query, sortBy);
+        filmSearch.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+        });
+        return filmSearch;
     }
 
     private void validate(Film film) {
@@ -117,7 +131,7 @@ public class FilmService {
             filmGenreService.addFilmGenre(film.getId(), film.getGenres());
             film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         }
-        if(film.getDirectors() != null) {
+        if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
             film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
         }

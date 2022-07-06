@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -20,18 +21,17 @@ public class ReviewController {
         return reviewService.getReviewById(id);
     }
 
-
     @GetMapping
     public Collection<Review> getAllReviewsByFilmId(
             @RequestParam(required = false) Long filmId,
             @RequestParam(defaultValue = "10", required = false) Long count) {
 
-        return reviewService.getAllReviews(filmId, count);
+        return reviewService.getAllReviewsByFilmId(filmId, count);
     }
 
     @PostMapping
-    public Review addReview(@Valid @RequestBody Review review) {
-        return reviewService.addReview(review);
+    public Review createReview(@Valid @RequestBody Review review) {
+        return reviewService.createReview(review);
     }
 
     @PutMapping
@@ -40,40 +40,24 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public void removeReviewById(@PathVariable Long id) {
         reviewService.removeReviewById(id);
     }
 
-
     @PutMapping("/{id}/like/{userId}")
-    public Review putLikeReview(
-            @PathVariable Long id,
-            @PathVariable Long userId
-    ) {
-        return reviewService.addLikeReview(id, userId);
+    @ResponseStatus(HttpStatus.OK)
+    public void LikeReview(@Valid @RequestBody Review review,
+                           @PathVariable Long id,
+                           @PathVariable Long userId) {
+        reviewService.updateReviewLike(id, userId, review);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    public Review putDislikeReview(
-            @PathVariable Long id,
-            @PathVariable Long userId
-    ) {
-        return reviewService.addDislikeReview(id, userId);
-    }
-
-    @DeleteMapping("/{id}/like/{userId}")
-    public Review deleteLikeReview(
-            @PathVariable Long id,
-            @PathVariable Long userId
-    ) {
-        return reviewService.removeLikeReview(id, userId);
-    }
-
-    @DeleteMapping("/{id}/dislike/{userId}")
-    public Review deleteDislikeReview(
-            @PathVariable Long id,
-            @PathVariable Long userId
-    ) {
-        return reviewService.removeDislikeReview(id, userId);
+    @ResponseStatus(HttpStatus.OK)
+    public void DislikeReview(@Valid @RequestBody Review review,
+                              @PathVariable Long id,
+                              @PathVariable Long userId) {
+        reviewService.updateReviewDislike(id, userId, review);
     }
 }
