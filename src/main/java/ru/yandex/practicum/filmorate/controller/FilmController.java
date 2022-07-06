@@ -27,6 +27,12 @@ public class FilmController {
         this.filmDirectorService = filmDirectorService;
     }
 
+    @GetMapping("/films/common")
+    public List<Film> getCommonFilms(@RequestParam  int userId,
+                                     @RequestParam int friendId) {
+        return filmService.getCommon(userId, friendId);
+    }
+
     @GetMapping("/films")
     public Collection<Film> getFilms() {
         log.debug("Текущее количество фильмов: {}", filmService.getFilms().size());
