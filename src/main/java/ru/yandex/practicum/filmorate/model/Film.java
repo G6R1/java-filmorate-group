@@ -1,13 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 
 @Data
-
+@NoArgsConstructor
 public class Film {
     @NotBlank(message = "incorrect name")
     private String name;
@@ -23,10 +25,20 @@ public class Film {
     private int duration;
     @NotNull
     private RateMpa mpa;
+    private Set<Director> directors;
     private Set<Genre> genres;
     private int rateUsers;
 
     public static final Comparator<Film>
             COMPARE_BY_RATE = (film1, film2) -> film2.getRateUsers() -
             film1.getRateUsers();
+
+    public Film(String name, long id, String description, String releaseDate, int duration, RateMpa mpa, Genre genre) {
+        this.name = name;
+        this.id = id;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+    }
 }

@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RateMpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -24,6 +22,12 @@ public class FilmController {
     @Autowired
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
+    }
+
+    @GetMapping("/films/common")
+    public List<Film> getCommonFilms(@RequestParam int userId,
+                                     @RequestParam int friendId) {
+        return filmService.getCommon(userId, friendId);
     }
 
     @GetMapping("/films")
@@ -69,5 +73,17 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> getPopular(@Positive @RequestParam(defaultValue = "10", required = false) int count) {
         return filmService.getPopular(count);
+    }
+
+    @GetMapping("/films/director/{directorId}")
+    public Collection<Film> getFilmsByDirector(@PathVariable int directorId,
+                                               @RequestParam Collection<String> sortBy) {
+        return filmService.getFilmsByDirector(directorId, sortBy);
+    }
+
+    @GetMapping("films/search")
+    public Collection<Film> getFilmsSearch(@RequestParam String query,
+                                           @RequestParam String by) {
+        return filmService.getFilmSearch(query, by);
     }
 }
