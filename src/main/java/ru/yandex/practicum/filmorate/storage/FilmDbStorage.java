@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmDirectorService;
+<<<<<<< HEAD
+=======
+import ru.yandex.practicum.filmorate.service.GenreService;
+>>>>>>> add-common-films
 import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.sql.PreparedStatement;
@@ -21,15 +25,45 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
     private FilmDirectorService filmDirectorService;
     private MpaService mpaService;
+    private GenreService genreService;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
+<<<<<<< HEAD
     public FilmDbStorage(FilmDirectorService filmDirectorService
             , MpaService mpaService
             , JdbcTemplate jdbcTemplate) {
         this.filmDirectorService = filmDirectorService;
+=======
+    public FilmDbStorage(FilmDirectorService filmDirectorService,
+                         GenreService genreService,
+                         MpaService mpaService,
+                         JdbcTemplate jdbcTemplate) {
+        this.filmDirectorService = filmDirectorService;
+        this.genreService = genreService;
+>>>>>>> add-common-films
         this.mpaService = mpaService;
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public List<Film> getCommon(int userId, int friendId) {
+        String sql = "SELECT f.FILM_ID, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID, count(l.USER_ID) AS count_films " +
+                "FROM films AS f " +
+                "LEFT JOIN RATE_USERS AS l ON f.FILM_ID = l.FILM_ID " +
+                "WHERE l.USER_ID = ? and f.FILM_ID in " +
+                "(select films.FILM_ID from FILMS, RATE_USERS where films.film_id = RATE_USERS.film_id and RATE_USERS.user_id = ?) " +
+                "GROUP BY f.film_id, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID " +
+                "ORDER BY count_films desc ";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new Film(
+                        rs.getString("film_name"),
+                        rs.getLong("film_id"),
+                        rs.getString("film_description"),
+                        rs.getString("film_release_date"),
+                        rs.getInt("film_duration"),
+                        mpaService.getMpa(rs.getInt("mpa_id")),
+                        genreService.getGenre(rs.getInt("film_id"))),
+                userId, friendId);
     }
 
     @Override
@@ -76,8 +110,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void removeFilm(long filmId) {
-        String sqlQuery = "delete from films where id = ?";
+        String sqlQuery = "DELETE FROM FILMS where FILM_ID = ?";
         jdbcTemplate.update(sqlQuery, filmId);
+
     }
 
     @Override
@@ -118,6 +153,10 @@ public class FilmDbStorage implements FilmStorage {
         return sortFilm;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> add-common-films
     public Collection<Film> getFilmsSearch(String query, String sortBy) {
         List<Film> sortFilm = new ArrayList<>();
         if (sortBy.equals("title,director")) {

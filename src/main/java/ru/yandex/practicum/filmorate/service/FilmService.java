@@ -36,6 +36,10 @@ public class FilmService {
         this.userService = userService;
     }
 
+    public List<Film>  getCommon(int userId,int friendId){
+        return filmStorage.getCommon(userId, friendId);
+    }
+
     public Film getFilm(long filmId) {
         Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
         if (!filmGenreService.getFilmGenres(filmId).isEmpty()) {
@@ -105,8 +109,11 @@ public class FilmService {
         filmSearchByDirector.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+<<<<<<< HEAD
             if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
                 film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+=======
+>>>>>>> add-common-films
         });
         return filmSearchByDirector;
     }
@@ -116,8 +123,11 @@ public class FilmService {
         filmSearch.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+<<<<<<< HEAD
             if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
                 film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+=======
+>>>>>>> add-common-films
         });
         return filmSearch;
     }

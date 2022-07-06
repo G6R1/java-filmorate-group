@@ -71,4 +71,13 @@ public class UserController {
     public User removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
         return userService.removeFriend(id, friendId);
     }
+<<<<<<< HEAD
+=======
+
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void removeUser(@PathVariable Long id) {
+        userService.removeUser(id);
+    }
+>>>>>>> add-common-films
 }

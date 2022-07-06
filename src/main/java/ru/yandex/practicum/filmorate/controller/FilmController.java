@@ -24,6 +24,12 @@ public class FilmController {
         this.filmService = filmService;
     }
 
+    @GetMapping("/films/common")
+    public List<Film> getCommonFilms(@RequestParam int userId,
+                                     @RequestParam int friendId) {
+        return filmService.getCommon(userId, friendId);
+    }
+
     @GetMapping("/films")
     public Collection<Film> getFilms() {
         log.debug("Текущее количество фильмов: {}", filmService.getFilms().size());
@@ -50,7 +56,11 @@ public class FilmController {
 
     @DeleteMapping("/films/{id}")
     @ResponseStatus(HttpStatus.OK)
+<<<<<<< HEAD
     public void delete(@PathVariable Long id) {
+=======
+    public void removeFilm(@PathVariable Long id) {
+>>>>>>> add-common-films
         filmService.removeFilm(id);
     }
 

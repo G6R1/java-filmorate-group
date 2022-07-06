@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 drop table if exists
  genres,rate_mpa,films,film_genres,FILM_DIRECTOR,DIRECTORS,user_user,rate_users,user_friends, reviews;
+=======
+ drop table if exists genres, rate_mpa, films, film_genres, DIRECTORS, FILM_DIRECTOR, user_user, rate_users, user_friends;
+>>>>>>> add-common-films
 
 CREATE TABLE IF NOT EXISTS genres (
  genre_id INTEGER PRIMARY KEY,
@@ -22,6 +26,7 @@ CREATE TABLE IF NOT EXISTS films (
  CONSTRAINT fk_mpa FOREIGN KEY (mpa_id) REFERENCES  rate_mpa (mpa_id)
 );
 
+<<<<<<< HEAD
 CREATE TABLE IF NOT EXISTS film_genres (
  film_id BIGINT REFERENCES films (film_id),
  genre_id INTEGER REFERENCES genres (genre_id) ON DELETE CASCADE
@@ -36,6 +41,34 @@ CREATE TABLE IF NOT EXISTS film_director (
  director_id int references directors (director_id) ON DELETE CASCADE,
  film_id BIGINT references films (film_id) ON DELETE CASCADE
 );
+=======
+ CREATE TABLE IF NOT EXISTS film_genres (
+  film_id BIGINT,
+  genre_id INTEGER,
+
+  constraint FILM_GENRES_FILMS_FILM_ID_FK
+      foreign key (FILM_ID) references FILMS (FILM_ID) ON DELETE CASCADE,
+  constraint FILM_GENRES_GENRES_GENRE_ID_FK
+      foreign key (GENRE_ID) references GENRES (GENRE_ID) ON DELETE CASCADE
+ );
+>>>>>>> add-common-films
+
+create table IF NOT EXISTS DIRECTORS
+(
+    DIRECTOR_ID   INT auto_increment,
+    DIRECTOR_NAME CHARACTER VARYING(100),
+    constraint DIRECTOR_FILM_PK
+        primary key (DIRECTOR_ID)
+);
+
+create table IF NOT EXISTS FILM_DIRECTOR
+(
+    FILM_ID     BIGINT not null,
+    DIRECTOR_ID INT    not null,
+    CONSTRAINT pkFilmDirector PRIMARY KEY (FILM_ID, DIRECTOR_ID),
+        foreign key (DIRECTOR_ID) references DIRECTORS (DIRECTOR_ID) ON DELETE CASCADE,
+        foreign key (FILM_ID) references FILMS (FILM_ID) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS user_user (
  user_name VARCHAR(50),
@@ -46,13 +79,24 @@ CREATE TABLE IF NOT EXISTS user_user (
 );
 
 CREATE TABLE IF NOT EXISTS rate_users (
+<<<<<<< HEAD
  film_id BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
  user_id BIGINT REFERENCES user_user(user_id) ON DELETE CASCADE
+=======
+ film_id BIGINT,
+ user_id BIGINT,
+
+ constraint RATE_USERS_FILMS_FILM_ID_FK
+     foreign key (FILM_ID) references FILMS (FILM_ID) ON DELETE CASCADE,
+ constraint RATE_USERS_USER_USER_USER_ID_FK
+     foreign key (USER_ID) references USER_USER (USER_ID) ON DELETE CASCADE
+>>>>>>> add-common-films
 );
 
 CREATE TABLE IF NOT EXISTS user_friends (
- user_id BIGINT REFERENCES user_user (user_id),
+ user_id BIGINT,
  friend_id BIGINT,
+<<<<<<< HEAD
  friend_status BOOlEAN
 );
 
@@ -63,4 +107,11 @@ CREATE TABLE IF NOT EXISTS reviews (
  user_id BIGINT REFERENCES user_user (user_id) ON DELETE CASCADE,
  film_id BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
  useful INTEGER DEFAULT 0
+=======
+ friend_status BOOlEAN,
+
+ constraint FRIENDS_USERS_USER_ID_FK
+     foreign key (USER_ID) references user_user ON DELETE CASCADE,
+ foreign key (FRIEND_ID) references user_user ON DELETE CASCADE
+>>>>>>> add-common-films
 );
