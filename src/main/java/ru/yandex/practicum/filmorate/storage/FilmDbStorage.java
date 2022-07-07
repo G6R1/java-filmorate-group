@@ -42,7 +42,7 @@ public class FilmDbStorage implements FilmStorage {
                 "(select films.FILM_ID from FILMS, RATE_USERS where films.film_id = RATE_USERS.film_id and RATE_USERS.user_id = ?) " +
                 "GROUP BY f.film_id, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID " +
                 "ORDER BY count_films desc ";
-        return jdbcTemplate.query(sql, this::makeFilm);
+        return jdbcTemplate.query(sql, this::makeFilm, userId, friendId);
     }
 
     @Override
