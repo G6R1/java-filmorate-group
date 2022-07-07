@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
+@AllArgsConstructor
 public class Review {
     private long id;
     @NotNull
@@ -17,7 +20,7 @@ public class Review {
     //содержание отзыва
     private String content;
     //рейтинг полезности
-    private int useful;
+    private Long useful;
     @NotNull
     //тип отзыва
     private Boolean isPositive;

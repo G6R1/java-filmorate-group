@@ -162,4 +162,42 @@ public class FilmDbStorage implements FilmStorage {
         }
         return sortFilm;
     }
+
+    public Collection<Film> getFilmsPopular(int count, Integer genre, String year) {
+        List<Film> sortFilm = new ArrayList<>();
+        if (genre != null && year != null) {
+            String sqlQuery = "select f.*, fg.* FROM films f " +
+                    "JOIN rate_mpa r on f.mpa_id=r.mpa_id " +
+                    "JOIN film_genres fg ON f.film_id = fg.film_id " +
+                    "LEFT JOIN rate_users ru ON f.film_id = ru.film_id " +
+                    "WHERE fg.genre_id = ? and f.film_release_date like ('%" + year +"%') " +
+                    "GROUP BY f.film_id ORDER BY count(ru.user_id) desc LIMIT ?;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, genre, count);
+        }
+        if (genre != null && year == null) {
+            String sqlQuery = "select f.*, r.* FROM films f " +
+                    "JOIN rate_mpa r on f.mpa_id=r.mpa_id " +
+                    "JOIN film_genres fg ON f.film_id = fg.film_id " +
+                    "LEFT JOIN rate_users ru ON f.film_id = ru.film_id " +
+                    "WHERE fg.genre_id = ? " +
+                    "GROUP BY f.film_id ORDER BY count(ru.user_id) desc LIMIT ?;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, genre, count);
+        }
+        if (year != null && genre == null) {
+            String sqlQuery = "select f.*, r.* FROM films f " +
+                    "JOIN rate_mpa r on f.mpa_id=r.mpa_id " +
+                    "LEFT JOIN rate_users ru ON f.film_id = ru.film_id " +
+                    "WHERE f.film_release_date like ('%" + year +"%') " +
+                    "GROUP BY f.film_id ORDER BY count(ru.user_id) desc LIMIT ?;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, count);
+        }
+        if (year == null && genre == null) {
+            String sqlQuery = "select f.*, r.* FROM films f " +
+                    "JOIN rate_mpa r on f.mpa_id=r.mpa_id " +
+                    "LEFT JOIN rate_users ru ON f.film_id = ru.film_id " +
+                    "GROUP BY f.film_id ORDER BY count(ru.user_id) desc LIMIT ?;";
+            sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, count);
+        }
+        return sortFilm;
+    }
 }

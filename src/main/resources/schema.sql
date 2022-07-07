@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS films, user_user, user_friends, rate_users, rate_mpa, genres, film_genres, reviews, review_rating;
+DROP TABLE IF EXISTS films,user_user,user_friends,rate_users,rate_mpa,genres,film_genres,directors,film_director, reviews, review_rating;
 
 CREATE TABLE IF NOT EXISTS genres (
   genre_id INTEGER PRIMARY KEY,
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS rate_mpa (
 CREATE TABLE IF NOT EXISTS films (
  film_id BIGINT PRIMARY KEY AUTO_INCREMENT,
  film_name VARCHAR(50) NOT NULL,
- film_release_date DATE NOT NULL CHECK (film_release_date > '1895-12-28'),
+ film_release_date VARCHAR(50) NOT NULL,
  film_description VARCHAR(200),
  film_duration INTEGER NOT NULL,
  mpa_id INTEGER,
