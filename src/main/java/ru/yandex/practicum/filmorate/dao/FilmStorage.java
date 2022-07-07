@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface FilmStorage {
 
-    List<Film> getCommon(int userId, int friendId);
+    List<Film> getCommon(long userId, long friendId);
 
     //создаёт фильм
     void createFilm(Film film);
@@ -28,6 +28,7 @@ public interface FilmStorage {
 
     Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy);
 
-
     Collection<Film> getFilmsSearch(String query, String sortBy);
+
+    Collection<Film> getFilmsPopular(int count, Integer genre, String year);
 }

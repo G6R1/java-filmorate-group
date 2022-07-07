@@ -9,36 +9,35 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class Review {
-    private long reviewId;
+    private long id;
+    @NotBlank
+    //содержание отзыва
+    private String content;
+    @NotNull
+    //тип отзыва
+    private Boolean isPositive;
     @NotNull
     private Long userId;
     @NotNull
     private Long filmId;
-    @NotBlank
-    //содержание отзыва
-    private String content;
     //рейтинг полезности
     private long useful;
-    @NotNull
-    //тип отзыва
-    private Boolean isPositive;
 
-    public Review(long reviewId, long userId, long filmId, String content, Boolean isPositive) {
-        this.reviewId = reviewId;
-        this.userId = userId;
-        this.filmId = filmId;
+    public Review(long id, String content, Boolean isPositive, long userId, long filmId) {
+        this.id = id;
         this.content = content;
         this.isPositive = isPositive;
+        this.userId = userId;
+        this.filmId = filmId;
     }
 
     @JsonCreator
-    public Review(long reviewId, Long userId, Long filmId, String content, long useful, Boolean isPositive) {
-        this.reviewId = reviewId;
+    public Review(long id, String content, Boolean isPositive, Long userId, Long filmId, long useful) {
+        this.id = id;
+        this.content = content;
+        this.isPositive = isPositive;
         this.userId = userId;
         this.filmId = filmId;
-        this.content = content;
         this.useful = useful;
-        this.isPositive = isPositive;
     }
-
 }

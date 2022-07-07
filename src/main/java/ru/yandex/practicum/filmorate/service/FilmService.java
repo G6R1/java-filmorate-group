@@ -38,12 +38,18 @@ public class FilmService {
         this.filmDirectorService = filmDirectorService;
     }
 
-    public List<Film>  getCommon(int userId,int friendId){
-        return filmStorage.getCommon(userId, friendId);
+    public List<Film> getCommon(long userId, long friendId) {
+        List<Film> common = filmStorage.getCommon(userId, friendId);
+        common.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return common;
     }
 
     public Film getFilm(long filmId) {
-        Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
+        Film film = filmStorage.getFilm(filmId).orElseThrow(()
+                -> new NotFoundException("такого фильма нет в списке"));
         if (!filmGenreService.getFilmGenres(filmId).isEmpty()) {
             film.setGenres(filmGenreService.getFilmGenres(filmId));
         }
@@ -147,10 +153,6 @@ public class FilmService {
     }
 
     private void filmVariablesCheck (Film film) {
-        /*if (film.getGenres() != null) {
-            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-        }*/
         if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
             film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
@@ -159,5 +161,14 @@ public class FilmService {
             rateUserService.addRateUser(film.getId(), film.getRateUsers());
             film.setRateUsers(film.getRateUsers());
         }
+    }
+
+    public Collection<Film> getFilmsPopular(int count, Integer genre, String year) {
+        Collection<Film> filmSearch = filmStorage.getFilmsPopular(count, genre, year);
+        filmSearch.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return filmSearch;
     }
 }
