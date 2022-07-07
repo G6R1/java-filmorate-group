@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.model;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
+@AllArgsConstructor
 public class Review {
-    private long reviewId;
+    private long id;
     @NotNull
     private Long userId;
     @NotNull
@@ -18,27 +20,16 @@ public class Review {
     //содержание отзыва
     private String content;
     //рейтинг полезности
-    private long useful;
+    private Long useful;
     @NotNull
     //тип отзыва
     private Boolean isPositive;
 
-    public Review(long reviewId, long userId, long filmId, String content, Boolean isPositive) {
-        this.reviewId = reviewId;
+    public Review(long id, long userId, long filmId, String content, Boolean isPositive) {
+        this.id = id;
         this.userId = userId;
         this.filmId = filmId;
         this.content = content;
         this.isPositive = isPositive;
     }
-
-    @JsonCreator
-    public Review(long reviewId, Long userId, Long filmId, String content, long useful, Boolean isPositive) {
-        this.reviewId = reviewId;
-        this.userId = userId;
-        this.filmId = filmId;
-        this.content = content;
-        this.useful = useful;
-        this.isPositive = isPositive;
-    }
-
 }
