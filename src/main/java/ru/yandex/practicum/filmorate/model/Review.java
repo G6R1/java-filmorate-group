@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class Review {
-    private long id;
+    private long reviewId;
     @NotBlank
     //содержание отзыва
     private String content;
@@ -23,8 +23,8 @@ public class Review {
     //рейтинг полезности
     private long useful;
 
-    public Review(long id, String content, Boolean isPositive, long userId, long filmId) {
-        this.id = id;
+    public Review(long reviewId, String content, Boolean isPositive, long userId, long filmId) {
+        this.reviewId = reviewId;
         this.content = content;
         this.isPositive = isPositive;
         this.userId = userId;
@@ -32,8 +32,8 @@ public class Review {
     }
 
     @JsonCreator
-    public Review(long id, String content, Boolean isPositive, Long userId, Long filmId, long useful) {
-        this.id = id;
+    public Review(long reviewId, String content, Boolean isPositive, Long userId, Long filmId, long useful) {
+        this.reviewId = reviewId;
         this.content = content;
         this.isPositive = isPositive;
         this.userId = userId;

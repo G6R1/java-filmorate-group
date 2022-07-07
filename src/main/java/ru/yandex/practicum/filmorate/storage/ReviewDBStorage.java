@@ -38,7 +38,7 @@ public class ReviewDBStorage implements ReviewStorage {
             stmt.setLong(4, review.getFilmId());
             return stmt;
         }, keyHolder);
-        review.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        review.setReviewId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         log.info("Добавлен отзыв: {}", review);
         return review;
     }
@@ -53,9 +53,9 @@ public class ReviewDBStorage implements ReviewStorage {
         jdbcTemplate.update(sql,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getId());
+                review.getReviewId());
 
-        log.info("Изменён отзыв: {}", getReviewById(review.getId()));
+        log.info("Изменён отзыв: {}", getReviewById(review.getReviewId()));
         return review;
     }
 
