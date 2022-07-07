@@ -12,26 +12,30 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-    private FilmDirectorService filmDirectorService;
-    private FilmGenreService filmGenreService;
-    private FilmStorage filmStorage;
-    private RateUserService rateUserService;
-    private UserService userService;
+    final private FilmGenreService filmGenreService;
+    final private FilmStorage filmStorage;
+    final private RateUserService rateUserService;
+    final private UserService userService;
+    final private EventService eventService;
+    final private FilmDirectorService filmDirectorService;
 
     @Autowired
-    public FilmService(FilmDirectorService filmDirectorService
-            , FilmGenreService filmGenreService
-            , FilmStorage filmStorage
-            , RateUserService rateUserService
-            , UserService userService) {
-        this.filmDirectorService = filmDirectorService;
+    public FilmService(FilmGenreService filmGenreService,
+                       FilmStorage filmStorage,
+                       RateUserService rateUserService,
+                       UserService userService,
+                       EventService eventService,
+                       FilmDirectorService filmDirectorService) {
         this.filmGenreService = filmGenreService;
         this.filmStorage = filmStorage;
         this.rateUserService = rateUserService;
         this.userService = userService;
+        this.eventService = eventService;
+        this.filmDirectorService = filmDirectorService;
     }
 
     public List<Film> getCommon(long userId, long friendId) {
@@ -52,20 +56,32 @@ public class FilmService {
         if (!rateUserService.getRateUsers(filmId).isEmpty()) {
             film.setRateUsers(rateUserService.getRateUsers(filmId).size());
         }
+        if (!filmDirectorService.getFilmDirectors(filmId).isEmpty())
+            film.setDirectors(filmDirectorService.getFilmDirectors(filmId));
         return film;
     }
 
     public Film createFilm(Film film) {
-        filmStorage.createFilm(film);
         validate(film);
+        filmStorage.createFilm(film);
+        filmVariablesCheck(film);
+        if (film.getGenres() != null) {
+            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
         return film;
     }
 
     public Film updateFilm(Film film) {
+        validate(film);
         getFilm(film.getId());
         filmGenreService.removeFilmGenre(film.getId());
         filmDirectorService.removeFilmDirectors(film.getId());
-        validate(film);
+        filmVariablesCheck(film);
+        if (film.getGenres() != null) {
+            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
+            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        }
         filmStorage.updateFilm(film);
         return film;
     }
@@ -84,6 +100,9 @@ public class FilmService {
         User user = userService.getUser(userId);
         rateUserService.addRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
+
+        eventService.createEvent(userId, "LIKE", "ADD", filmId);
+
         return getFilm(filmId);
     }
 
@@ -92,11 +111,21 @@ public class FilmService {
         Film film = getFilm(filmId);
         if (!rateUserService.getRateUsers(filmId).contains(userId))
             throw new NotFoundException("пользователь не ставил лайков");
+
+        eventService.createEvent(userId, "LIKE", "REMOVE", filmId);
+
         rateUserService.removeRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
         return getFilm(filmId);
     }
 
+    public List<Film> getPopular(int count) {
+        List<Film> films = getFilms();
+        List<Film> popular = new ArrayList<>();
+        films.forEach(film -> popular.add(getFilm(film.getId())));
+        popular.sort(Film.COMPARE_BY_RATE);
+        return popular.stream().limit(count).collect(Collectors.toList());
+    }
 
     public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy) {
         filmDirectorService.getDirector(directorId);
@@ -119,13 +148,11 @@ public class FilmService {
 
     private void validate(Film film) {
         if (LocalDate.parse(film.getReleaseDate()).isBefore(LocalDate.of(1895, 12, 28))) {
-            filmStorage.removeFilm(film.getId());
-            throw new ValidationException("неправильный фильм");
+            throw new ValidationException("Некорректная дата релиза фильма");
         }
-        if (film.getGenres() != null) {
-            filmGenreService.addFilmGenre(film.getId(), film.getGenres());
-            film.setGenres(filmGenreService.getFilmGenres(film.getId()));
-        }
+    }
+
+    private void filmVariablesCheck (Film film) {
         if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
             film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));

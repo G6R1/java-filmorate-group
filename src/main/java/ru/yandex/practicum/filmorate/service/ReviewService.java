@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.ReviewStorage;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Review;
 
@@ -15,20 +16,33 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final UserService userService;
     private final FilmService filmService;
+    private final EventService eventService;
     private static final long USEFUL_CHANGE_STEP = 1;
 
 
     public Review addReview(Review review) {
         validate(review);
-        return reviewStorage.add(review);
+        Review newReview = reviewStorage.add(review);
+
+        eventService.createEvent(newReview.getUserId(), "REVIEW", "ADD", newReview.getReviewId());
+
+        return newReview;
     }
 
     public Review updateReview(Review review) {
         validate(review);
-        return reviewStorage.update(review);
+        Review updateReview = reviewStorage.update(review);
+
+        Review updateReviewForEvent = getReviewById(review.getReviewId()).orElseThrow();
+        eventService.createEvent(updateReviewForEvent.getUserId(), "REVIEW", "UPDATE",
+                updateReviewForEvent.getReviewId());
+
+        return updateReview;
     }
 
     public void removeReviewById(Long id) {
+        eventService.createEvent(getReviewById(id).orElseThrow().getUserId(), "REVIEW", "REMOVE", id);
+
         reviewStorage.remove(id);
     }
 
@@ -37,6 +51,9 @@ public class ReviewService {
     }
 
     public Collection<Review> getAllReviews(Long id, Long count) {
+        if (id != null) {
+            filmService.getFilm(id);
+        }
         return reviewStorage.getAllReviewsByFilmId(id, count);
     }
 
