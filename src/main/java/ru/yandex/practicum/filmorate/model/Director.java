@@ -6,7 +6,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class Director {
-
     int id;
     @NotBlank
     String name;

@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -23,8 +22,7 @@ public class FilmService {
     private UserService userService;
 
     @Autowired
-    public FilmService(
-            FilmDirectorService filmDirectorService
+    public FilmService(FilmDirectorService filmDirectorService
             , FilmGenreService filmGenreService
             , FilmStorage filmStorage
             , RateUserService rateUserService
@@ -36,20 +34,24 @@ public class FilmService {
         this.userService = userService;
     }
 
-    public List<Film>  getCommon(int userId,int friendId){
-        return filmStorage.getCommon(userId, friendId);
+    public List<Film> getCommon(long userId, long friendId) {
+        List<Film> common = filmStorage.getCommon(userId, friendId);
+        common.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return common;
     }
 
     public Film getFilm(long filmId) {
-        Film film = filmStorage.getFilm(filmId).orElseThrow(() -> new NotFoundException("такого фильма нет в списке"));
+        Film film = filmStorage.getFilm(filmId).orElseThrow(()
+                -> new NotFoundException("такого фильма нет в списке"));
         if (!filmGenreService.getFilmGenres(filmId).isEmpty()) {
             film.setGenres(filmGenreService.getFilmGenres(filmId));
         }
         if (!rateUserService.getRateUsers(filmId).isEmpty()) {
             film.setRateUsers(rateUserService.getRateUsers(filmId).size());
         }
-        if (!filmDirectorService.getFilmDirectors(filmId).isEmpty())
-            film.setDirectors(filmDirectorService.getFilmDirectors(filmId));
         return film;
     }
 
@@ -95,13 +97,6 @@ public class FilmService {
         return getFilm(filmId);
     }
 
-    public List<Film> getPopular(int count) {
-        List<Film> films = getFilms();
-        List<Film> popular = new ArrayList<>();
-        films.forEach(film -> popular.add(getFilm(film.getId())));
-        popular.sort(Film.COMPARE_BY_RATE);
-        return popular.stream().limit(count).collect(Collectors.toList());
-    }
 
     public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy) {
         filmDirectorService.getDirector(directorId);
@@ -139,5 +134,14 @@ public class FilmService {
             rateUserService.addRateUser(film.getId(), film.getRateUsers());
             film.setRateUsers(film.getRateUsers());
         }
+    }
+
+    public Collection<Film> getFilmsPopular(int count, Integer genre, String year) {
+        Collection<Film> filmSearch = filmStorage.getFilmsPopular(count, genre, year);
+        filmSearch.forEach(film -> {
+            if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
+                film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        return filmSearch;
     }
 }

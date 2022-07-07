@@ -27,8 +27,8 @@ public class FilmDirectorDbStorage implements FilmDirectorStorage {
     }
 
     public void addFilmDirector(long filmId, int directorId) {
-        String sql1 = "insert into film_director (film_id, director_id) values (?, ?)";
-        jdbcTemplate.update(sql1, filmId, directorId);
+        String sql = "insert into film_director (film_id, director_id) values (?, ?)";
+        jdbcTemplate.update(sql, filmId, directorId);
     }
 
     public void removeFilmDirector(long filmId) {
