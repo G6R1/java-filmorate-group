@@ -74,40 +74,4 @@ public class EventDbStorage implements EventStorage {
 
         return new Event(eventId, userId, eventType, operation, timestamp, entityId);
     }
-
-    /**
-     * Дополнительный метод для извлечения id из таблицы user_friends (необходимо для создания объекта Event),
-     * т.к. логика работы механизма добавления и удаления друзей не позволяет в процессе извлечь эту
-     * информацию.
-     * @return
-     */
-    @Override
-    public Long getFriendshipEntityId(Long userId, Long friendId){
-        String sql = "select friendship_id from user_friends where user_id = ? and friend_id = ?";
-        SqlRowSet friendshipIdRow = jdbcTemplate.queryForRowSet(sql, userId, friendId);
-
-        if (friendshipIdRow.next()) {
-            return friendshipIdRow.getLong("friendship_id");
-        } else {
-            throw new RuntimeException("Ошибка при извлечении friendship_id.");
-        }
-    }
-
-    /**
-     * Дополнительный метод для извлечения rate_id из таблицы rate_users (необходимо для создания объекта Event)
-     * @param userId
-     * @param filmId
-     * @return
-     */
-    @Override
-    public Long getRateEntityId(Long userId, Long filmId) {
-        String sql = "select rate_id from rate_users where user_id = ? and film_id = ?";
-        SqlRowSet rateIdRow = jdbcTemplate.queryForRowSet(sql, userId, filmId);
-
-        if (rateIdRow.next()) {
-            return rateIdRow.getLong("rate_id");
-        } else {
-            throw new RuntimeException("Ошибка при извлечении rate_id.");
-        }
-    }
 }

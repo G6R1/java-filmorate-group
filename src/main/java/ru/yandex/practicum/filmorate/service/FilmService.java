@@ -95,8 +95,7 @@ public class FilmService {
         rateUserService.addRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
 
-        Long rateId = eventService.getRateEntityId(userId, filmId);
-        eventService.createEvent(userId, "LIKE", "ADD", rateId);
+        eventService.createEvent(userId, "LIKE", "ADD", filmId);
 
         return getFilm(filmId);
     }
@@ -107,8 +106,7 @@ public class FilmService {
         if (!rateUserService.getRateUsers(filmId).contains(userId))
             throw new NotFoundException("пользователь не ставил лайков");
 
-        Long rateId = eventService.getRateEntityId(userId, filmId);
-        eventService.createEvent(userId, "LIKE", "REMOTE", rateId);
+        eventService.createEvent(userId, "LIKE", "REMOVE", filmId);
 
         rateUserService.removeRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);

@@ -22,7 +22,7 @@ public class EventService {
 
     public void createEvent(Long userId, String eventType, String operation, Long entityId) {
         Long timestamp = Instant.now().toEpochMilli();
-        eventStorage.createEvent(new Event(userId, eventType, operation,timestamp, entityId));
+        eventStorage.createEvent(new Event(userId, eventType, operation, timestamp, entityId));
     }
 
     public List<Event> getUserEvents(Long userId) {
@@ -30,13 +30,5 @@ public class EventService {
         userService.getUser(userId);
 
         return eventStorage.getUserEvents(userId);
-    }
-
-    public Long getFriendshipEntityId(Long userId, Long friendId) {
-        return eventStorage.getFriendshipEntityId(userId, friendId);
-    }
-
-    public Long getRateEntityId(Long userId, Long filmId) {
-        return eventStorage.getRateEntityId(userId, filmId);
     }
 }

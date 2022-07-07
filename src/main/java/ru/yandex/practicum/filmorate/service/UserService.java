@@ -57,8 +57,7 @@ public class UserService {
         user.addFriend(friendId);
         userStorage.updateUser(user);
 
-        Long friendshipId = eventService.getFriendshipEntityId(userId, friendId);
-        eventService.createEvent(userId, "FRIEND", "ADD", friendshipId);
+        eventService.createEvent(userId, "FRIEND", "ADD", friendId);
 
         return user;
     }
@@ -70,8 +69,7 @@ public class UserService {
             throw new NotFoundException("список друзей отсутствует");
         user.removeFriend(friendId);
 
-        Long friendshipId = eventService.getFriendshipEntityId(userId, friendId);
-        eventService.createEvent(userId, "FRIEND", "REMOVE", friendshipId);
+        eventService.createEvent(userId, "FRIEND", "REMOVE", friendId);
 
         userStorage.updateUser(user);
         return user;
