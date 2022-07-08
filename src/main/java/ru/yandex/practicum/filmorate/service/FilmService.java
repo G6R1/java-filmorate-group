@@ -92,12 +92,8 @@ public class FilmService {
         return getFilm(filmId);
     }
 
-    public List<Film> getPopular(int count) {
-        List<Film> films = getFilms();
-        List<Film> popular = new ArrayList<>();
-        films.forEach(film -> popular.add(getFilm(film.getId())));
-        popular.sort(Film.COMPARE_BY_RATE);
-        return popular.stream().limit(count).collect(Collectors.toList());
+    public List<Film> getPopular(int count, Integer genreId, int year) {
+        return filmStorage.getTopFilms(count, genreId, year);
     }
 
     private void validate(Film film) {

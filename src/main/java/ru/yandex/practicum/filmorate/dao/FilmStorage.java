@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,4 +22,7 @@ public interface FilmStorage {
 
     //возвращает список фильмов
     Map<Long, Film> getFilms();
+
+    //Возвращает топ {count} фильмов с жанром {genreId} и годом релиза {year}
+    List<Film> getTopFilms(Integer count, Integer genreId, Integer year);
 }

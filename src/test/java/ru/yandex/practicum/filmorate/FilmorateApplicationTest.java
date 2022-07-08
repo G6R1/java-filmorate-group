@@ -32,4 +32,6 @@ class FilmoRateApplicationTests {
                 .isPresent()
                 .hasValueSatisfying((user1 -> assertThat(String.valueOf(user))));
     }
+
+
 }

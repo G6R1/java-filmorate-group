@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.RateMpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -67,7 +65,9 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getPopular(@Positive @RequestParam(defaultValue = "10", required = false) int count) {
-        return filmService.getPopular(count);
+    public List<Film> getPopular(@Positive @RequestParam(defaultValue = "10", required = false) int count,
+                                 @RequestParam(defaultValue = "0", required = false) Integer genreId,
+                                 @RequestParam(defaultValue = "-1", required = false) int year) {
+        return filmService.getPopular(count, genreId, year);
     }
 }
