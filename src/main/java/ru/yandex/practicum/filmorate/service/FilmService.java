@@ -119,14 +119,6 @@ public class FilmService {
         return getFilm(filmId);
     }
 
-    public List<Film> getPopular(int count) {
-        List<Film> films = getFilms();
-        List<Film> popular = new ArrayList<>();
-        films.forEach(film -> popular.add(getFilm(film.getId())));
-        popular.sort(Film.COMPARE_BY_RATE);
-        return popular.stream().limit(count).collect(Collectors.toList());
-    }
-
     public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy) {
         filmDirectorService.getDirector(directorId);
         Collection<Film> filmSearchByDirector = filmStorage.getFilmsByDirector(directorId, sortBy);
@@ -152,7 +144,7 @@ public class FilmService {
         }
     }
 
-    private void filmVariablesCheck (Film film) {
+    private void filmVariablesCheck(Film film) {
         if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
             film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));

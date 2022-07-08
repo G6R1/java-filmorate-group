@@ -56,9 +56,7 @@ public class UserService {
         User user = getUser(userId);
         user.addFriend(friendId);
         userStorage.updateUser(user);
-
         eventService.createEvent(userId, "FRIEND", "ADD", friendId);
-
         return user;
     }
 
@@ -68,9 +66,7 @@ public class UserService {
         if (!user.getFriends().contains(friendId))
             throw new NotFoundException("список друзей отсутствует");
         user.removeFriend(friendId);
-
         eventService.createEvent(userId, "FRIEND", "REMOVE", friendId);
-
         userStorage.updateUser(user);
         return user;
     }
