@@ -12,12 +12,12 @@ import lombok.ToString;
 public class Event {
     private Long eventId;
     private final Long userId;
-    private final String eventType; // одно из значениий LIKE, REVIEW или FRIEND
-    private final String operation; // одно из значениий REMOVE, ADD, UPDATE
+    private final EventType eventType; // одно из значениий LIKE, REVIEW или FRIEND
+    private final EventOperation operation; // одно из значениий REMOVE, ADD, UPDATE
     private final Long timestamp;
     private final Long entityId;
 
-    public Event(Long eventId, Long userId, String eventType, String operation, Long timestamp, Long entityId) {
+    public Event(Long eventId, Long userId, EventType eventType, EventOperation operation, Long timestamp, Long entityId) {
         this.eventId = eventId;
         this.userId = userId;
         this.eventType = eventType;

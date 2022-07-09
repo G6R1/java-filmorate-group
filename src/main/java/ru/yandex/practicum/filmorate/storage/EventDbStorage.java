@@ -6,6 +6,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.EventStorage;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,8 +68,8 @@ public class EventDbStorage implements EventStorage {
     private Event makeEvent(ResultSet rs) throws SQLException {
         Long eventId = rs.getLong("event_id");
         Long userId = rs.getLong("user_id");
-        String eventType = rs.getString("event_type"); // одно из значениий LIKE, REVIEW или FRIEND
-        String operation = rs.getString("operation"); // одно из значениий REMOVE, ADD, UPDATE
+        EventType eventType = EventType.valueOf(rs.getString("event_type"));
+        EventOperation operation = EventOperation.valueOf(rs.getString("operation"));
         Long timestamp = rs.getLong("event_time");
         Long entityId = rs.getLong("entity_id");
 
