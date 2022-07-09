@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
 public enum SortType {
-    likes,
-    year;
-
+    likes, year, title, director
 }

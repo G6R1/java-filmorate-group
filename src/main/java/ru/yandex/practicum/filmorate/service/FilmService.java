@@ -14,8 +14,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -132,7 +132,7 @@ public class FilmService {
         return filmSearchByDirector;
     }
 
-    public Collection<Film> getFilmSearch(String query, String sortBy) {
+    public Collection<Film> getFilmSearch(String query, EnumSet<SortType> sortBy) {
         Collection<Film> filmSearch = filmStorage.getFilmsSearch(query, sortBy);
         filmSearch.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())

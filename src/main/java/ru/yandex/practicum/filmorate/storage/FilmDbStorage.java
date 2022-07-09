@@ -133,9 +133,9 @@ public class FilmDbStorage implements FilmStorage {
         return sortFilm;
     }
 
-    public Collection<Film> getFilmsSearch(String query, String sortBy) {
+    public Collection<Film> getFilmsSearch(String query, EnumSet<SortType> sortBy) {
         List<Film> sortFilm = new ArrayList<>();
-        if (sortBy.equals("title,director")) {
+        if (sortBy.equals(EnumSet.of(SortType.title, SortType.director))) {
             String sqlQuery = "select* " +
                     "FROM films f LEFT JOIN film_director fd ON f.film_id = fd.film_id" +
                     " LEFT JOIN directors d ON d.director_id = fd.director_id" +
@@ -145,14 +145,14 @@ public class FilmDbStorage implements FilmStorage {
                     " GROUP BY f.film_id ORDER BY count(ru.user_id) desc;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm);
         }
-        if (sortBy.equals("title")) {
+        if (sortBy.equals(EnumSet.of(SortType.title))) {
             String sqlQuery = "select* " +
                     "FROM films f LEFT JOIN rate_users ru ON f.film_id = ru.film_id" +
                     " where lower(f.film_name) like lower('%" + query + "%')" +
                     " GROUP BY f.film_id ORDER BY count(ru.user_id) desc;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm);
         }
-        if (sortBy.equals("director")) {
+        if (sortBy.equals(EnumSet.of(SortType.director))) {
             String sqlQuery = "select* " +
                     "FROM films f LEFT JOIN film_director fd ON f.film_id = fd.film_id" +
                     " LEFT JOIN directors d ON d.director_id = fd.director_id" +
@@ -171,7 +171,7 @@ public class FilmDbStorage implements FilmStorage {
                     "JOIN rate_mpa r on f.mpa_id=r.mpa_id " +
                     "JOIN film_genres fg ON f.film_id = fg.film_id " +
                     "LEFT JOIN rate_users ru ON f.film_id = ru.film_id " +
-                    "WHERE fg.genre_id = ? and f.film_release_date like ('%" + year +"%') " +
+                    "WHERE fg.genre_id = ? and f.film_release_date like ('%" + year + "%') " +
                     "GROUP BY f.film_id ORDER BY count(ru.user_id) desc LIMIT ?;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, genre, count);
         }
@@ -188,7 +188,7 @@ public class FilmDbStorage implements FilmStorage {
             String sqlQuery = "select f.*, r.* FROM films f " +
                     "JOIN rate_mpa r on f.mpa_id=r.mpa_id " +
                     "LEFT JOIN rate_users ru ON f.film_id = ru.film_id " +
-                    "WHERE f.film_release_date like ('%" + year +"%') " +
+                    "WHERE f.film_release_date like ('%" + year + "%') " +
                     "GROUP BY f.film_id ORDER BY count(ru.user_id) desc LIMIT ?;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, count);
         }

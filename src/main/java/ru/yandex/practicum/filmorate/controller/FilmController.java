@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 @RestController
@@ -56,7 +57,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/films/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFilm(@PathVariable Long id) {
         filmService.removeFilm(id);
     }
@@ -68,7 +69,6 @@ public class FilmController {
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
     public Film delete(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.removeLike(id, userId);
     }
@@ -81,7 +81,7 @@ public class FilmController {
 
     @GetMapping("films/search")
     public Collection<Film> getFilmsSearch(@RequestParam String query,
-                                           @RequestParam String by) {
+                                           @RequestParam EnumSet<SortType> by) {
         return filmService.getFilmSearch(query, by);
     }
 
