@@ -8,6 +8,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.service.FilmDirectorService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 
@@ -42,7 +43,7 @@ public class FilmDbStorage implements FilmStorage {
                 "(select films.FILM_ID from FILMS, RATE_USERS where films.film_id = RATE_USERS.film_id and RATE_USERS.user_id = ?) " +
                 "GROUP BY f.film_id, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID " +
                 "ORDER BY count_films desc ";
-        return jdbcTemplate.query(sql, this::makeFilm);
+        return jdbcTemplate.query(sql, this::makeFilm, userId, friendId);
     }
 
     @Override
@@ -113,15 +114,15 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sort) {
+    public Collection<Film> getFilmsByDirector(int directorId, SortType sort) {
         List<Film> sortFilm = new ArrayList<>();
-        if (sort.iterator().next().equals("year")) {
+        if (sort.name().equals("year")) {
             String sqlQuery = "SELECT f.*, d.* FROM films f JOIN film_director fd " +
                     "ON f.film_id = fd.film_id  JOIN directors d ON d.director_id = fd.director_id" +
                     " WHERE fd.director_id = ? ORDER BY FILM_RELEASE_DATE ASC;";
             sortFilm = jdbcTemplate.query(sqlQuery, this::makeFilm, directorId);
         }
-        if (sort.iterator().next().equals("likes")) {
+        if (sort.name().equals("likes")) {
             String sqlQuery = "SELECT f.*, d.*, count(USER_ID) as count " +
                     "FROM films f JOIN film_director fd ON f.film_id = fd.film_id" +
                     " JOIN directors d ON d.director_id = fd.director_id" +

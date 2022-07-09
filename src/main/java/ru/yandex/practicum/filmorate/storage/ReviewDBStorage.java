@@ -27,18 +27,18 @@ public class ReviewDBStorage implements ReviewStorage {
     @Override
     public Review add(Review review) {
 
-        String sql = "insert into reviews (user_id, film_id, content, is_positive)" +
+        String sql = "insert into reviews (content, is_positive, user_id, film_id)" +
                 " values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"review_id"});
-            stmt.setLong(1, review.getUserId());
-            stmt.setLong(2, review.getFilmId());
-            stmt.setString(3, review.getContent());
-            stmt.setBoolean(4, review.getIsPositive());
+            stmt.setString(1, review.getContent());
+            stmt.setBoolean(2, review.getIsPositive());
+            stmt.setLong(3, review.getUserId());
+            stmt.setLong(4, review.getFilmId());
             return stmt;
         }, keyHolder);
-        review.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        review.setReviewId(Objects.requireNonNull(keyHolder.getKey()).longValue());
         log.info("Добавлен отзыв: {}", review);
         return review;
     }
@@ -53,9 +53,9 @@ public class ReviewDBStorage implements ReviewStorage {
         jdbcTemplate.update(sql,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getId());
+                review.getReviewId());
 
-        log.info("Изменён отзыв: {}", getReviewById(review.getId()));
+        log.info("Изменён отзыв: {}", getReviewById(review.getReviewId()));
         return review;
     }
 
@@ -71,10 +71,10 @@ public class ReviewDBStorage implements ReviewStorage {
         if (reviewRows.next()) {
             Review review = new Review(
                     reviewRows.getLong("review_id"),
-                    reviewRows.getLong("user_id"),
-                    reviewRows.getLong("film_id"),
                     reviewRows.getString("content"),
-                    reviewRows.getBoolean("is_positive"));
+                    reviewRows.getBoolean("is_positive"),
+                    reviewRows.getLong("user_id"),
+                    reviewRows.getLong("film_id"));
             log.info("Получен отзыв: {}", id);
             return Optional.of(review);
         } else {
@@ -110,11 +110,11 @@ public class ReviewDBStorage implements ReviewStorage {
         while (allReviewRows.next()) {
             allReview.add(new Review(
                     allReviewRows.getLong("RREV_ID"),
+                    allReviewRows.getString("content"),
+                    allReviewRows.getBoolean("is_positive"),
                     allReviewRows.getLong("RUS_ID"),
                     allReviewRows.getLong("film_id"),
-                    allReviewRows.getString("content"),
-                    allReviewRows.getLong("SUM"),
-                    allReviewRows.getBoolean("is_positive")));
+                    allReviewRows.getLong("SUM")));
         }
         return allReview;
     }
