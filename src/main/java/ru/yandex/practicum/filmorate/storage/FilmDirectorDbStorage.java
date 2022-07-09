@@ -27,11 +27,6 @@ public class FilmDirectorDbStorage implements FilmDirectorStorage {
         return new FilmDirector(rs.getLong("film_id"), rs.getInt("director_id"));
     }
 
-    public List<FilmDirector> getFilmDirectors(long filmId) {
-        String sql = "select * from film_director where film_id = ?";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> makeFilmDirector(rs), filmId);
-    }
-
     public void addFilmDirector(long filmId, int directorId) {
         String sql = "insert into film_director (film_id, director_id) values (?, ?)";
         jdbcTemplate.update(sql, filmId, directorId);

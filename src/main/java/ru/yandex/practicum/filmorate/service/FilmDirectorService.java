@@ -22,15 +22,6 @@ public class FilmDirectorService {
         this.directorService = directorService;
     }
 
-    public Set<Director> getFilmDirectors(long filmId) {
-        return filmDirectorStorage.getFilmDirectors(filmId)
-                .stream()
-                .map(FilmDirector::getDirectorId)
-                .map(directorService::getDirector)
-                .sorted(Comparator.comparing(Director::getId))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
     void addFilmDirectors(long filmId, Set<Director> directors) {
         directors.forEach((director) -> filmDirectorStorage.addFilmDirector(filmId, director.getId()));
     }

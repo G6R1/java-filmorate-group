@@ -133,7 +133,7 @@ public class FilmService {
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         });
         filmSearchByDirector.forEach(film -> {
-            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+            if (!filmDirectorService.getDirectorFromFilm(film.getId()).isEmpty())
                 film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         });
         return filmSearchByDirector;
@@ -146,7 +146,7 @@ public class FilmService {
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         });
         filmSearch.forEach(film -> {
-            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+            if (!filmDirectorService.getDirectorFromFilm(film.getId()).isEmpty())
                 film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         });
         return filmSearch;
@@ -161,7 +161,7 @@ public class FilmService {
     private void filmVariablesCheck(Film film) {
         if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
-            film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+            film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         }
         if (film.getRateUsers() != 0) {
             rateUserService.addRateUser(film.getId(), film.getRateUsers());
