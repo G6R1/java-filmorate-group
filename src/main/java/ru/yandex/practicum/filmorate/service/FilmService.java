@@ -98,7 +98,6 @@ public class FilmService {
         for (Film film : allFilms) {
             film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         }
-        ;
         return allFilms;
     }
 
@@ -145,6 +144,10 @@ public class FilmService {
         filmSearch.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        filmSearch.forEach(film -> {
+            if (!filmDirectorService.getFilmDirectors(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         });
         return filmSearch;
     }
