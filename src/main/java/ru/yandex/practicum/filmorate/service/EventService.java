@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.EventStorage;
 import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,7 +22,7 @@ public class EventService {
         this.userService = userService;
     }
 
-    void createEvent(Long userId, String eventType, String operation, Long entityId) {
+    void createEvent(Long userId, EventType eventType, EventOperation operation, Long entityId) {
         Long timestamp = Instant.now().toEpochMilli();
         eventStorage.createEvent(new Event(userId, eventType, operation, timestamp, entityId));
     }

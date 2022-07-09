@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.model.User;
@@ -102,7 +104,7 @@ public class FilmService {
         rateUserService.addRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
 
-        eventService.createEvent(userId, "LIKE", "ADD", filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
 
         return getFilm(filmId);
     }
@@ -113,7 +115,7 @@ public class FilmService {
         if (!rateUserService.getRateUsers(filmId).contains(userId))
             throw new NotFoundException("пользователь не ставил лайков");
 
-        eventService.createEvent(userId, "LIKE", "REMOVE", filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
 
         rateUserService.removeRateUser(film.getId(), user.getId());
         filmStorage.updateFilm(film);
