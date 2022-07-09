@@ -30,22 +30,19 @@ public class DirectorController {
     }
 
     @PutMapping("/directors")
-    public Director update(@RequestBody Director director) {
+    public Director update(@Valid @RequestBody Director director) {
         log.info("Получен запрос на обновление данных режиссера");
-        if (director.getId() <= 0 & director.getName() == null) {
-            throw new NotFoundException("ID режиссера меньше или равно 0");
-        }
         return directorService.updateDirector(director);
     }
 
     @DeleteMapping("/directors/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void delete(@PathVariable int id) {
+    public void delete(@Valid @PathVariable int id) {
         directorService.removeDirector(id);
     }
 
     @GetMapping("/directors/{id}")
-    public Director getById(@PathVariable int id) {
+    public Director getById(@Valid @PathVariable int id) {
         log.info("Получен запрос на получение данных режиссера");
         return directorService.getDirector(id);
     }
