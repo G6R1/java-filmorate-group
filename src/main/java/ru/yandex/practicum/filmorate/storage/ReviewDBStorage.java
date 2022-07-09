@@ -61,13 +61,19 @@ public class ReviewDBStorage implements ReviewStorage {
 
     @Override
     public void remove(Long id) {
-        jdbcTemplate.update("delete from reviews where review_id = ?", id);
+        jdbcTemplate.update("update reviews" +
+                        " set deleted = ?" +
+                        " where review_id = ?",
+                true, id);
         log.info("Удалён отзыв: {}", id);
     }
 
     @Override
     public Optional<Review> getReviewById(Long id) {
-        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select * from reviews where review_id = ?", id);
+        SqlRowSet reviewRows = jdbcTemplate.queryForRowSet("select *" +
+                " from reviews" +
+                " where review_id = ?" +
+                " AND deleted = ?", id, false);
         if (reviewRows.next()) {
             Review review = new Review(
                     reviewRows.getLong("review_id"),
@@ -93,19 +99,21 @@ public class ReviewDBStorage implements ReviewStorage {
                     "(CASE WHEN sum(rr.useful) IS NULL THEN 0 ELSE sum(rr.useful) END) as sum " +
                     "from reviews as r " +
                     "left join review_rating as rr on rr.review_id = r.review_id " +
+                    "where r.deleted = ?" +
                     "group by r.review_id " +
                     "order by sum desc " +
-                    "LIMIT ?", count);
+                    "LIMIT ?", false, count);
         } else {
             allReviewRows = jdbcTemplate.queryForRowSet("select r.review_id as rrev_id, r.user_id as rus_id, " +
-                    "film_id, content, is_positive, " +
+                    "film_id, content, is_positive," +
                     "(CASE WHEN sum(rr.useful) IS NULL THEN 0 ELSE sum(rr.useful) END) as sum " +
                     "from reviews as r " +
                     "left join review_rating as rr on rr.review_id = r.review_id " +
                     "where film_id = ? " +
+                    "AND r.deleted = ? " +
                     "group by r.review_id " +
                     "order by sum desc " +
-                    "LIMIT ?", filmId, count);
+                    "LIMIT ?", filmId, false, count);
         }
         while (allReviewRows.next()) {
             allReview.add(new Review(

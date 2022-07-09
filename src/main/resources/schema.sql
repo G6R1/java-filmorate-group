@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     film_id BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
     content varchar NOT NULL,
     is_positive Boolean NOT NULL,
+     deleted Boolean DEFAULT false,
     CONSTRAINT pk_reviews PRIMARY KEY (review_id)
 );
 

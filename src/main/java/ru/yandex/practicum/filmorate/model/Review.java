@@ -23,6 +23,8 @@ public class Review {
     //тип отзыва
     private Boolean isPositive;
 
+    private Boolean deleted;
+
     public Review(long reviewId, long userId, long filmId, String content, Boolean isPositive) {
         this.reviewId = reviewId;
         this.userId = userId;
