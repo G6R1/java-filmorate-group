@@ -56,7 +56,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/films/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeFilm(@PathVariable Long id) {
         filmService.removeFilm(id);
     }
@@ -68,7 +68,6 @@ public class FilmController {
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.OK)
     public Film delete(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.removeLike(id, userId);
     }
