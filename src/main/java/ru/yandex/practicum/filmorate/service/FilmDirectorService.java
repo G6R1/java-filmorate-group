@@ -42,4 +42,8 @@ public class FilmDirectorService {
     void getDirector(int directorId) {
         directorService.getDirector(directorId);
     }
+
+    Set<Director> getDirectorFromFilm(long filmId){
+        return filmDirectorStorage.getDirectorFromFilm(filmId);
+    };
 }
