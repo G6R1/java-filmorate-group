@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 @RestController
@@ -80,7 +81,7 @@ public class FilmController {
 
     @GetMapping("films/search")
     public Collection<Film> getFilmsSearch(@RequestParam String query,
-                                           @RequestParam String by) {
+                                           @RequestParam EnumSet<SortType> by) {
         return filmService.getFilmSearch(query, by);
     }
 

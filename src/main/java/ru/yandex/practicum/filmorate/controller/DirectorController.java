@@ -24,6 +24,7 @@ public class DirectorController {
     }
 
     @PostMapping("/directors")
+    @ResponseStatus(HttpStatus.CREATED)
     public Director create(@Valid @RequestBody Director director) {
         log.info("Получен запрос на создание нового режиссера");
         return directorService.createDirector(director);

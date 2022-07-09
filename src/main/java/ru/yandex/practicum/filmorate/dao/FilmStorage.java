@@ -3,10 +3,7 @@ package ru.yandex.practicum.filmorate.dao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.SortType;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public interface FilmStorage {
 
@@ -29,7 +26,7 @@ public interface FilmStorage {
 
     Collection<Film> getFilmsByDirector(int directorId, SortType sortBy);
 
-    Collection<Film> getFilmsSearch(String query, String sortBy);
+    Collection<Film> getFilmsSearch(String query, EnumSet<SortType> sortBy);
 
     Collection<Film> getFilmsPopular(int count, Integer genre, String year);
 }
