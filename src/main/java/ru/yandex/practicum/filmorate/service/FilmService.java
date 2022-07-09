@@ -59,8 +59,7 @@ public class FilmService {
         if (!rateUserService.getRateUsers(filmId).isEmpty()) {
             film.setRateUsers(rateUserService.getRateUsers(filmId).size());
         }
-        if (!filmDirectorService.getFilmDirectors(filmId).isEmpty())
-            film.setDirectors(filmDirectorService.getFilmDirectors(filmId));
+        film.setDirectors(filmDirectorService.getDirectorFromFilm(filmId));
         return film;
     }
 
@@ -95,7 +94,11 @@ public class FilmService {
     }
 
     public List<Film> getFilms() {
-        return new ArrayList<>(filmStorage.getFilms().values());
+        List<Film> allFilms = new ArrayList<>(filmStorage.getFilms().values());
+        for (Film film : allFilms) {
+            film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
+        }
+        return allFilms;
     }
 
     public Film addLike(long filmId, long userId) {
@@ -129,6 +132,10 @@ public class FilmService {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
         });
+        filmSearchByDirector.forEach(film -> {
+            if (!filmDirectorService.getDirectorFromFilm(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
+        });
         return filmSearchByDirector;
     }
 
@@ -137,6 +144,10 @@ public class FilmService {
         filmSearch.forEach(film -> {
             if (!filmGenreService.getFilmGenres(film.getId()).isEmpty())
                 film.setGenres(filmGenreService.getFilmGenres(film.getId()));
+        });
+        filmSearch.forEach(film -> {
+            if (!filmDirectorService.getDirectorFromFilm(film.getId()).isEmpty())
+                film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         });
         return filmSearch;
     }
@@ -150,7 +161,7 @@ public class FilmService {
     private void filmVariablesCheck(Film film) {
         if (film.getDirectors() != null) {
             filmDirectorService.addFilmDirectors(film.getId(), film.getDirectors());
-            film.setDirectors(filmDirectorService.getFilmDirectors(film.getId()));
+            film.setDirectors(filmDirectorService.getDirectorFromFilm(film.getId()));
         }
         if (film.getRateUsers() != 0) {
             rateUserService.addRateUser(film.getId(), film.getRateUsers());

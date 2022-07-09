@@ -110,7 +110,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setReleaseDate(resultSet.getString("film_release_date"));
         film.setDuration(resultSet.getInt("film_duration"));
         film.setMpa(mpaService.getMpa(resultSet.getInt("mpa_id")));
-        film.setDirectors(filmDirectorService.getFilmDirectors(resultSet.getLong("film_id")));
         return film;
     }
 
