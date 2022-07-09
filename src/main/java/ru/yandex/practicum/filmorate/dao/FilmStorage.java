@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortType;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +27,7 @@ public interface FilmStorage {
     //возвращает список фильмов
     Map<Long, Film> getFilms();
 
-    Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy);
+    Collection<Film> getFilmsByDirector(int directorId, SortType sortBy);
 
     Collection<Film> getFilmsSearch(String query, String sortBy);
 

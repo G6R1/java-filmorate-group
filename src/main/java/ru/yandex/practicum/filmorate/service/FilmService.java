@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -119,7 +120,7 @@ public class FilmService {
         return getFilm(filmId);
     }
 
-    public Collection<Film> getFilmsByDirector(int directorId, Collection<String> sortBy) {
+    public Collection<Film> getFilmsByDirector(int directorId, SortType sortBy) {
         filmDirectorService.getDirector(directorId);
         Collection<Film> filmSearchByDirector = filmStorage.getFilmsByDirector(directorId, sortBy);
         filmSearchByDirector.forEach(film -> {

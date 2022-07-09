@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortType;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -74,7 +75,7 @@ public class FilmController {
 
     @GetMapping("/films/director/{directorId}")
     public Collection<Film> getFilmsByDirector(@PathVariable int directorId,
-                                               @RequestParam Collection<String> sortBy) {
+                                               @RequestParam SortType sortBy) {
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
 
