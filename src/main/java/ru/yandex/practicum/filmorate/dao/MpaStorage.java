@@ -10,4 +10,6 @@ public interface MpaStorage {
     List<RateMpa> getAllMpa();
 
     Optional<RateMpa> getRateMpa(int mpaId);
+
+    Optional<RateMpa> getFilmMpa(long filmId);
 }

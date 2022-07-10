@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.UserFriendStorage;
 import ru.yandex.practicum.filmorate.dao.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -19,11 +18,10 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserDbStorage implements UserStorage {
-    private UserFriendStorage userFriendStorage;
+
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(UserFriendStorage userFriendStorage, JdbcTemplate jdbcTemplate) {
-        this.userFriendStorage = userFriendStorage;
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -41,9 +39,6 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
         user.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
-        if (user.getFriends() != null) {
-            userFriendStorage.addUserFriend(user.getId(), user.getFriends());
-        }
     }
 
     @Override
@@ -68,9 +63,6 @@ public class UserDbStorage implements UserStorage {
                 , user.getEmail()
                 , user.getBirthday()
                 , user.getId());
-        userFriendStorage.removeUserFriend(user.getId());
-        if (user.getFriends() != null)
-            userFriendStorage.addUserFriend(user.getId(), user.getFriends());
     }
 
     @Override
@@ -93,8 +85,6 @@ public class UserDbStorage implements UserStorage {
         user.setId(resultSet.getLong("user_id"));
         user.setEmail(resultSet.getString("user_email"));
         user.setBirthday(resultSet.getString("user_birthday"));
-        if (!userFriendStorage.getUserFriends(user.getId()).isEmpty())
-            user.setFriends(userFriendStorage.getUserFriends(user.getId()));
         return user;
     }
 }

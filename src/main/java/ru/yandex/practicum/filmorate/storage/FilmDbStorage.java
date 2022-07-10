@@ -9,38 +9,32 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.SortType;
-import ru.yandex.practicum.filmorate.service.FilmDirectorService;
-import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class FilmDbStorage implements FilmStorage {
-    private FilmDirectorService filmDirectorService;
-    private MpaService mpaService;
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
 
-    public FilmDbStorage(FilmDirectorService filmDirectorService,
-                         MpaService mpaService,
-                         JdbcTemplate jdbcTemplate) {
-        this.filmDirectorService = filmDirectorService;
-        this.mpaService = mpaService;
+    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<Film> getCommon(long userId, long friendId) {
-        String sql = "SELECT f.FILM_ID, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID, count(l.USER_ID) AS count_films " +
+    public Collection<Film> getCommon(long userId, long friendId) {
+        String sql = "SELECT " +
+                "f.FILM_ID, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID," +
+                " count(l.USER_ID) AS count_films " +
                 "FROM films AS f " +
                 "LEFT JOIN RATE_USERS AS l ON f.FILM_ID = l.FILM_ID " +
                 "WHERE l.USER_ID = ? and f.FILM_ID in " +
-                "(select films.FILM_ID from FILMS, RATE_USERS where films.film_id = RATE_USERS.film_id and RATE_USERS.user_id = ?) " +
+                "(select films.FILM_ID from FILMS, RATE_USERS where films.film_id = RATE_USERS.film_id " +
+                "and RATE_USERS.user_id = ?) " +
                 "GROUP BY f.film_id, f.FILM_NAME, f.FILM_DESCRIPTION, f.FILM_DURATION, f.FILM_RELEASE_DATE, f.MPA_ID " +
                 "ORDER BY count_films desc ";
         return jdbcTemplate.query(sql, this::makeFilm, userId, friendId);
@@ -96,10 +90,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Map<Long, Film> getFilms() {
+    public Collection<Film> getFilms() {
         String sqlQuery = "select* from films join rate_mpa using(mpa_id)";
-        return jdbcTemplate.query(sqlQuery, this::makeFilm)
-                .stream().collect(Collectors.toMap(Film::getId, item -> item));
+        return jdbcTemplate.query(sqlQuery, this::makeFilm);
     }
 
     private Film makeFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -109,7 +102,6 @@ public class FilmDbStorage implements FilmStorage {
         film.setDescription(resultSet.getString("film_description"));
         film.setReleaseDate(resultSet.getString("film_release_date"));
         film.setDuration(resultSet.getInt("film_duration"));
-        film.setMpa(mpaService.getMpa(resultSet.getInt("mpa_id")));
         return film;
     }
 

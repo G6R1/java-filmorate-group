@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -12,13 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@AllArgsConstructor
 public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public MpaDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
 
     private RateMpa makeMpa(ResultSet resultSet, int rowNum) throws SQLException {
         RateMpa rateMpa = new RateMpa();
@@ -41,5 +38,17 @@ public class MpaDbStorage implements MpaStorage {
     public List<RateMpa> getAllMpa() {
         String sqlQuery = "select * from rate_mpa";
         return jdbcTemplate.query(sqlQuery, this::makeMpa);
+    }
+
+    @Override
+    public Optional<RateMpa> getFilmMpa(long filmId) {
+        String sqlQuery = "select ra.* from rate_mpa ra " +
+                "JOIN films f ON ra.mpa_id=f.mpa_id WHERE f.film_id = ?";
+        try {
+            return Optional.ofNullable(jdbcTemplate
+                    .queryForObject(sqlQuery, this::makeMpa, filmId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 }
