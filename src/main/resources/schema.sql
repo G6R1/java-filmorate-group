@@ -32,13 +32,13 @@ CREATE TABLE IF NOT EXISTS film_genres
     CONSTRAINT pkFilmGenres PRIMARY KEY (film_id, genre_id)
 );
 
-create table IF NOT EXISTS directors
+CREATE TABLE IF NOT EXISTS directors
 (
     director_id   BIGINT PRIMARY KEY auto_increment,
     director_name VARCHAR(100)
 );
 
-create table IF NOT EXISTS film_director
+CREATE TABLE IF NOT EXISTS film_director
 (
     film_id     BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
     director_id BIGINT REFERENCES directors (director_id) ON DELETE CASCADE,
@@ -76,7 +76,8 @@ CREATE TABLE IF NOT EXISTS reviews
     user_id     BIGINT REFERENCES user_user (user_id) ON DELETE CASCADE,
     film_id     BIGINT REFERENCES films (film_id) ON DELETE CASCADE,
     content     varchar NOT NULL,
-    is_positive boolean NOT NULL
+    is_positive boolean NOT NULL,
+    deleted Boolean DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS review_rating

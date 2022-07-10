@@ -22,6 +22,7 @@ public class Review {
     private Long filmId;
     //рейтинг полезности
     private long useful;
+    private Boolean deleted;
 
     public Review(long reviewId, String content, Boolean isPositive, long userId, long filmId) {
         this.reviewId = reviewId;

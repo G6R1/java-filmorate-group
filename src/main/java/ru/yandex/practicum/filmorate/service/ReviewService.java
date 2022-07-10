@@ -24,27 +24,22 @@ public class ReviewService {
     public Review addReview(Review review) {
         validate(review);
         Review newReview = reviewStorage.add(review);
-
         eventService.createEvent(newReview.getUserId(), EventType.REVIEW, EventOperation.ADD, newReview.getReviewId());
-
         return newReview;
     }
 
     public Review updateReview(Review review) {
         validate(review);
         Review updateReview = reviewStorage.update(review);
-
         Review updateReviewForEvent = getReviewById(review.getReviewId()).orElseThrow();
         eventService.createEvent(updateReviewForEvent.getUserId(), EventType.REVIEW,
                 EventOperation.UPDATE, updateReviewForEvent.getReviewId());
-
         return updateReview;
     }
 
     public void removeReviewById(Long id) {
         eventService.createEvent(getReviewById(id).orElseThrow().getUserId(),
                 EventType.REVIEW, EventOperation.REMOVE, id);
-
         reviewStorage.remove(id);
     }
 

@@ -7,7 +7,7 @@ import java.util.*;
 
 public interface FilmStorage {
 
-    List<Film> getCommon(long userId, long friendId);
+    Collection<Film> getCommon(long userId, long friendId);
 
     //создаёт фильм
     void createFilm(Film film);
@@ -22,7 +22,7 @@ public interface FilmStorage {
     void removeFilm(long filmId);
 
     //возвращает список фильмов
-    Map<Long, Film> getFilms();
+    Collection<Film> getFilms();
 
     Collection<Film> getFilmsByDirector(int directorId, SortType sortBy);
 

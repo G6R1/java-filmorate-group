@@ -17,18 +17,24 @@ import java.util.Set;
 
 @Service
 public class UserService {
+    final private UserFriendsService userFriendsService;
     final private UserStorage userStorage;
     final private EventService eventService;
 
     @Autowired
-    public UserService(UserStorage userStorage, @Lazy EventService eventService) {
+    public UserService(UserFriendsService userFriendsService,
+                       UserStorage userStorage,
+                       @Lazy EventService eventService) {
+        this.userFriendsService =userFriendsService;
         this.userStorage = userStorage;
         this.eventService = eventService;
     }
 
     public User getUser(long userId) {
-        return userStorage.findUserById(userId)
+        User user = userStorage.findUserById(userId)
                 .orElseThrow(() -> new NotFoundException("такого пользователя нет в списке"));
+        user.setFriends(userFriendsService.getUserFriends(userId));
+        return user;
     }
 
     public User createUser(User user) {
@@ -40,6 +46,9 @@ public class UserService {
     public User updateUser(User user) {
         validate(user);
         getUser(user.getId());
+        userFriendsService.removeUserFriend(user.getId());
+        if (user.getFriends() != null)
+            userFriendsService.addUserFriend(user.getId(), user.getFriends());
         userStorage.updateUser(user);
         return user;
     }
@@ -57,7 +66,7 @@ public class UserService {
         User userFriend = getUser(friendId);
         User user = getUser(userId);
         user.addFriend(friendId);
-        userStorage.updateUser(user);
+        updateUser(user);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
         return user;
     }
@@ -69,7 +78,7 @@ public class UserService {
             throw new NotFoundException("список друзей отсутствует");
         user.removeFriend(friendId);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
-        userStorage.updateUser(user);
+        updateUser(user);
         return user;
     }
 
@@ -95,6 +104,5 @@ public class UserService {
         if (user.getLogin().isEmpty() && user.getLogin().contains(" "))
             throw new ValidationException("неправильный пользователь");
         if (user.getName() == null || user.getName().isBlank()) user.setName(user.getLogin());
-
     }
 }

@@ -25,4 +25,8 @@ public class MpaService {
     public List<RateMpa> getAllMpa() {
         return mpaStorage.getAllMpa();
     }
+
+    RateMpa getFilmMpa(long filmId) {
+        return mpaStorage.getFilmMpa(filmId).orElseThrow();
+    }
 }
